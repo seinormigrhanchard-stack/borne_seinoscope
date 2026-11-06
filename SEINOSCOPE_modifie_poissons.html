@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SEINOSCOPE — Les poissons migrateurs de la Seine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --eau-nuit:#071C24;
+  --eau-profonde:#0C2E3A;
+  --eau-mid:#154D5F;
+  --eau-claire:#3E7F92;
+  --embrun:#7FB4C2;
+  --ecume:#EFF6F3;
+  --limon:#C9B78D;
+  --limon-clair:#E4D9B8;
+  --cuivre:#D3873F;
+  --or-frai:#E9BD54;
+  --alerte:#C1503F;
+  --font-display:'Fraunces', serif;
+  --font-body:'Public Sans', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+  --nav-h: 9.5vh;
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none;}
+html,body{height:100%; margin:0; overflow:hidden;}
+body{
+  font-family: var(--font-body);
+  background: var(--eau-nuit);
+  color: var(--ecume);
+  width:100vw; height:100vh;
+}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+button:focus-visible, .tap:focus-visible{outline: 3px solid var(--or-frai); outline-offset:3px;}
+h1,h2,h3{font-family:var(--font-display); margin:0; font-weight:600;}
+p{margin:0;}
+::selection{background: var(--or-frai); color:var(--eau-nuit);}
+a{color:inherit;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+}
+
+#app{position:relative; width:100vw; height:100vh; background: radial-gradient(ellipse at 30% 0%, var(--eau-profonde), var(--eau-nuit) 70%);}
+
+.screen{
+  position:absolute; inset:0;
+  padding-bottom: var(--nav-h);
+  opacity:0; pointer-events:none;
+  transform: translateY(14px);
+  transition: opacity .5s ease, transform .5s ease;
+  overflow:hidden;
+}
+.screen.active{opacity:1; pointer-events:auto; transform:translateY(0);}
+
+/* ---------- texture d'eau ambiante ---------- */
+.eau-fx{position:absolute; inset:0; pointer-events:none; opacity:.35; mix-blend-mode:screen;}
+.eau-fx svg{width:100%; height:100%;}
+.ligne-eau{stroke:var(--embrun); stroke-width:1; fill:none; opacity:.5;}
+
+/* ============ VEILLE ============ */
+#veille{background: linear-gradient(180deg, var(--eau-nuit) 0%, #05161C 100%); padding-bottom:0;}
+.veille-centre{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2.2vh; text-align:center; padding: 0 6vw;
+}
+.veille-eyebrow{font-family:var(--font-mono); letter-spacing:.35em; text-transform:uppercase; font-size:clamp(11px,1.1vw,15px); color:var(--or-frai);}
+.veille-titre{font-size:clamp(38px,6.4vw,96px); line-height:1.02; color:var(--ecume);}
+.veille-titre em{font-style:normal; color:var(--or-frai);}
+.veille-sous{font-size:clamp(14px,1.4vw,20px); color:var(--embrun); max-width:44ch;}
+.veille-cta{
+  margin-top:2vh; font-family:var(--font-mono); font-size:clamp(13px,1.3vw,17px);
+  color:var(--eau-nuit); background:var(--or-frai); padding:1.1em 2.4em; border-radius:100px;
+  letter-spacing:.05em; animation: pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1); box-shadow:0 0 0 0 rgba(233,189,84,.4);} 50%{transform:scale(1.035); box-shadow:0 0 0 14px rgba(233,189,84,0);}}
+.veille-poissons{position:absolute; inset:0; pointer-events:none;}
+.veille-poisson{position:absolute; opacity:.55; filter:drop-shadow(0 0 12px rgba(233,189,84,.15));}
+
+/* ============ HEADER commun ============ */
+.entete{
+  position:relative; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 3.2vh 4vw 1.6vh;
+}
+.marque{display:flex; flex-direction:column; gap:.2vh;}
+.marque .nom{font-family:var(--font-display); font-size:clamp(20px,2vw,30px); font-weight:700; letter-spacing:.01em;}
+.marque .lieu{font-family:var(--font-mono); font-size:clamp(10px,.85vw,13px); color:var(--embrun); letter-spacing:.12em; text-transform:uppercase;}
+.btn-accueil{
+  display:flex; align-items:center; gap:.6em; font-family:var(--font-mono); font-size:clamp(11px,1vw,14px);
+  color:var(--embrun); border:1px solid var(--eau-mid); padding:.8em 1.4em; border-radius:100px; letter-spacing:.06em;
+  transition: border-color .25s, color .25s;
+}
+.btn-accueil:hover, .btn-accueil:active{color:var(--or-frai); border-color:var(--or-frai);}
+
+/* ============ ACCUEIL ============ */
+.accueil-corps{padding: 0 4vw; height: calc(100% - 13vh); display:flex; flex-direction:column; justify-content:center; gap:2.6vh;}
+.accueil-intro{max-width:60ch;}
+.accueil-intro h1{font-size:clamp(28px,3.2vw,46px); line-height:1.05;}
+.accueil-intro p{margin-top:1.2vh; font-size:clamp(12px,1.05vw,16px); color:var(--embrun); max-width:56ch;}
+.menu-grille{display:grid; grid-template-columns:repeat(3,1fr); gap:1.4vw 1.4vw;}
+.carte-menu{
+  position:relative; text-align:left; padding:2vh 1.5vw; border-radius:18px; min-height:17vh;
+  background: linear-gradient(160deg, var(--eau-mid), var(--eau-profonde));
+  border:1px solid rgba(127,180,194,.18);
+  display:flex; flex-direction:column; justify-content:space-between; gap:1.2vh;
+  transition: transform .25s ease, border-color .25s ease, background .25s ease;
+}
+.carte-menu:active{transform:scale(.97);}
+.carte-menu:hover{border-color:var(--or-frai); background:linear-gradient(160deg, var(--eau-mid), #123544);}
+.carte-menu .num{font-family:var(--font-mono); font-size:clamp(10px,.9vw,13px); color:var(--cuivre); letter-spacing:.1em;}
+.carte-menu h3{font-size:clamp(15px,1.5vw,21px); line-height:1.15;}
+.carte-menu .desc{font-size:clamp(10.5px,.88vw,13px); color:var(--embrun);}
+.carte-menu .fleche{align-self:flex-end; font-size:clamp(18px,1.6vw,24px); color:var(--or-frai);}
+
+/* ============ NAV RIVIERE (barre basse, signature) ============ */
+#riviere-nav{
+  position:absolute; left:0; right:0; bottom:0; height:var(--nav-h);
+  background: linear-gradient(0deg, #04141A 0%, rgba(6,26,33,.94) 80%, rgba(6,26,33,0) 100%);
+  display:flex; align-items:center; padding: 0 3vw; gap:1.4vw; z-index:20;
+  border-top:1px solid rgba(127,180,194,.15);
+}
+#riviere-nav.masquee{display:none;}
+.rn-label{font-family:var(--font-mono); font-size:clamp(9px,.78vw,12px); letter-spacing:.14em; text-transform:uppercase; color:var(--embrun); white-space:nowrap;}
+.rn-label.mer{color:var(--eau-claire);}
+.rn-label.amont{color:var(--limon);}
+.rn-piste{flex:1; position:relative; height:100%; display:flex; align-items:center;}
+.rn-piste svg{position:absolute; inset:0; width:100%; height:100%;}
+.rn-fish{
+  position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:.4vh;
+  background:none; padding:0; width:6.4vw; min-width:64px;
+}
+.rn-fish .pastille{
+  width:clamp(34px,3.4vw,50px); height:clamp(34px,3.4vw,50px); border-radius:50%;
+  background: var(--eau-profonde); border:2px solid var(--eau-claire);
+  display:flex; align-items:center; justify-content:center; transition: all .2s ease;
+}
+.rn-fish svg{width:64%; height:64%;}
+.rn-fish.catadrome .pastille{border-color:var(--cuivre);}
+.rn-fish:hover .pastille, .rn-fish:active .pastille{border-color:var(--or-frai); transform:translateY(-4px); background:var(--eau-mid);}
+.rn-fish .nom-mini{font-family:var(--font-mono); font-size:clamp(8px,.62vw,10px); color:var(--embrun); text-align:center; line-height:1.2;}
+.rn-fish.actif .pastille{border-color:var(--or-frai); background:var(--eau-mid); box-shadow:0 0 0 4px rgba(233,189,84,.15);}
+
+/* ============ POISSONS (liste + fiche) ============ */
+.vue-liste, .vue-fiche{position:absolute; top:11vh; right:0; bottom:0; left:0; padding:1vh 4vw 0; transition:opacity .35s ease, transform .35s ease; z-index:1;}
+.vue-fiche{opacity:0; pointer-events:none; transform:translateX(3vw);}
+#poissons.mode-fiche .vue-liste{opacity:0; pointer-events:none; transform:translateX(-3vw);}
+#poissons.mode-fiche .vue-fiche{opacity:1; pointer-events:auto; transform:translateX(0);}
+
+.section-titre{margin-bottom:2.2vh;}
+.section-titre h1{font-size:clamp(24px,2.8vw,42px);}
+.section-titre .sub{font-family:var(--font-mono); color:var(--embrun); font-size:clamp(11px,.95vw,14px); margin-top:.6vh; letter-spacing:.04em;}
+
+.grille-poissons{display:grid; grid-template-columns:repeat(3,1fr); gap:1.4vw; height:calc(100% - 8vh); overflow:hidden;}
+.carte-poisson{
+  border-radius:16px; background:var(--eau-profonde); border:1px solid rgba(127,180,194,.16);
+  display:flex; flex-direction:column; padding:1.6vh 1.4vw; gap:.6vh; text-align:left;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.carte-poisson:hover, .carte-poisson:active{transform:translateY(-4px); border-color:var(--or-frai);}
+.carte-poisson .visuel{height:7vh; display:flex; align-items:center; justify-content:center;}
+.carte-poisson .photo-espece{height:14vh; width:100%; margin:0 0 .7vh; border-radius:12px; overflow:hidden; background:rgba(7,28,36,.55); border:1px solid rgba(127,180,194,.16); display:flex; align-items:center; justify-content:center;}
+.carte-poisson .photo-espece img{width:100%; height:100%; object-fit:cover; display:block;}
+.carte-poisson .photo-espece .photo-fallback{font-family:var(--font-mono); font-size:10px; color:var(--embrun); text-align:center; padding:1em;}
+.carte-poisson .visuel svg{height:100%; max-width:90%;}
+.carte-poisson .type-tag{font-family:var(--font-mono); font-size:clamp(9px,.72vw,11px); letter-spacing:.1em; text-transform:uppercase; color:var(--cuivre); align-self:flex-start; border:1px solid rgba(211,135,63,.4); padding:.25em .7em; border-radius:100px;}
+.carte-poisson.anad .type-tag{color:var(--eau-claire); border-color:rgba(127,180,194,.4);}
+.carte-poisson h3{font-size:clamp(15px,1.4vw,20px); margin-top:.4vh;}
+.carte-poisson .latin{font-family:var(--font-mono); font-style:italic; font-size:clamp(10px,.85vw,13px); color:var(--embrun);}
+
+.fiche-corps{display:grid; grid-template-columns:1fr 1.15fr; gap:3vw; height:calc(100% - 8vh); align-items:center;}
+.fiche-visuel{display:flex; flex-direction:column; align-items:center; gap:2vh;}
+.fiche-visuel .cadre{width:100%; aspect-ratio:16/10; background:linear-gradient(160deg, var(--eau-mid), var(--eau-profonde)); border-radius:20px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(127,180,194,.2);}
+.fiche-visuel .cadre svg{width:72%; height:72%;}
+.fiche-carousel{width:100%;}
+.carousel-main{position:relative; width:100%; aspect-ratio:16/9; border-radius:18px; overflow:hidden; background:var(--eau-profonde); border:1px solid rgba(127,180,194,.2); touch-action:pan-y;}
+.carousel-main img{width:100%; height:100%; object-fit:cover; display:block;}
+.carousel-placeholder{height:100%; display:flex; align-items:center; justify-content:center; color:var(--embrun); font-family:var(--font-mono); font-size:clamp(10px,.8vw,12px); text-align:center; padding:2em;}
+.carousel-btn{position:absolute; top:50%; transform:translateY(-50%); width:clamp(34px,3vw,48px); height:clamp(34px,3vw,48px); border-radius:50%; background:rgba(7,28,36,.78); border:1px solid rgba(127,180,194,.35); color:var(--ecume); font-size:clamp(20px,1.8vw,28px); display:flex; align-items:center; justify-content:center; z-index:2; transition:all .2s ease;}
+.carousel-btn:hover,.carousel-btn:active{background:var(--eau-mid); border-color:var(--or-frai); color:var(--or-frai);}
+.carousel-prev{left:1vw;}
+.carousel-next{right:1vw;}
+.carousel-counter{position:absolute; right:1vw; bottom:1vh; background:rgba(7,28,36,.78); color:var(--ecume); font-family:var(--font-mono); font-size:10px; padding:.35em .65em; border-radius:100px; z-index:2;}
+.carousel-dots{display:flex; justify-content:center; align-items:center; gap:.45em; margin-top:.8vh; min-height:14px;}
+.carousel-dot{width:8px; height:8px; border-radius:50%; background:var(--eau-mid); border:1px solid var(--eau-claire); padding:0;}
+.carousel-dot.actif{background:var(--or-frai); border-color:var(--or-frai); transform:scale(1.2);}
+.carousel-thumbs{display:flex; gap:.55vw; overflow-x:auto; padding:.7vh .1vw .2vh; scrollbar-width:thin;}
+.carousel-thumb{flex:0 0 clamp(54px,5vw,78px); height:clamp(38px,4vw,58px); border-radius:8px; overflow:hidden; border:1px solid rgba(127,180,194,.25); padding:0; background:var(--eau-profonde);}
+.carousel-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+.carousel-thumb.actif{border-color:var(--or-frai); box-shadow:0 0 0 2px rgba(233,189,84,.15);}
+.retour-liste{font-family:var(--font-mono); font-size:clamp(11px,1vw,14px); color:var(--embrun); display:flex; align-items:center; gap:.6em; align-self:flex-start;}
+.retour-liste:hover{color:var(--or-frai);}
+.fiche-texte{overflow-y:auto; max-height:100%; padding-right:1vw;}
+.fiche-entete{display:flex; align-items:baseline; gap:1.2em; flex-wrap:wrap; margin-bottom:1.4vh;}
+.fiche-entete h2{font-size:clamp(24px,2.4vw,38px);}
+.fiche-entete .latin{font-family:var(--font-mono); font-style:italic; color:var(--embrun); font-size:clamp(13px,1.1vw,17px);}
+.fiche-badge{font-family:var(--font-mono); font-size:clamp(10px,.85vw,13px); letter-spacing:.08em; text-transform:uppercase; padding:.5em 1em; border-radius:100px; border:1px solid var(--eau-claire); color:var(--eau-claire); margin-bottom:2vh; display:inline-block;}
+.fiche-badge.cata{border-color:var(--cuivre); color:var(--cuivre);}
+.stat-grille{display:grid; grid-template-columns:1fr 1fr; gap:1.2vw 2vw; margin:2vh 0; padding:2vh 0; border-top:1px solid rgba(127,180,194,.18); border-bottom:1px solid rgba(127,180,194,.18);}
+.stat .label{font-family:var(--font-mono); font-size:clamp(9px,.75vw,11px); letter-spacing:.1em; text-transform:uppercase; color:var(--limon);}
+.stat .valeur{font-size:clamp(13px,1.15vw,17px); margin-top:.3vh;}
+.fiche-texte p.long{font-size:clamp(13px,1.1vw,16px); line-height:1.55; color:var(--ecume); margin-bottom:1.6vh;}
+.fiche-anecdote{background:rgba(233,189,84,.08); border-left:3px solid var(--or-frai); padding:1.4vh 1.4vw; border-radius:0 10px 10px 0; font-size:clamp(12px,1.05vw,15px); font-style:italic; color:var(--limon-clair);}
+.lien-source{display:inline-block; margin-top:1.6vh; margin-right:1.4em; font-family:var(--font-mono); font-size:clamp(10.5px,.92vw,13px); color:var(--or-frai); border-bottom:1px solid var(--or-frai); padding-bottom:.15em;}
+
+/* ============ SEINE (onglets historique/scientifique) ============ */
+.onglets{display:flex; gap:1vw; margin-bottom:2.4vh; flex-wrap:wrap;}
+.onglet{font-family:var(--font-mono); font-size:clamp(12px,1.05vw,15px); letter-spacing:.06em; padding:1em 1.8em; border-radius:100px; border:1px solid var(--eau-mid); color:var(--embrun);}
+.onglet.actif{color:var(--eau-nuit); background:var(--or-frai); border-color:var(--or-frai);}
+.panneau-onglet{display:none; height:calc(100% - 18vh); overflow-y:auto; padding-right:1vw;}
+.panneau-onglet.actif{display:block;}
+
+.frise{display:flex; flex-direction:column; gap:0; position:relative; padding-left:2.4vw;}
+.frise::before{content:''; position:absolute; left:.55vw; top:.6vh; bottom:.6vh; width:2px; background:linear-gradient(180deg, var(--eau-claire), var(--cuivre));}
+.frise-item{position:relative; padding:0 0 4vh 1.6vw;}
+.frise-item::before{content:''; position:absolute; left:-2.05vw; top:.3vh; width:14px; height:14px; border-radius:50%; background:var(--eau-nuit); border:2px solid var(--or-frai);}
+.frise-item .periode{font-family:var(--font-mono); color:var(--or-frai); font-size:clamp(11px,.95vw,14px); letter-spacing:.08em; text-transform:uppercase;}
+.frise-item h4{font-size:clamp(16px,1.5vw,21px); margin-top:.6vh;}
+.frise-item p{color:var(--embrun); font-size:clamp(12px,1.05vw,15px); margin-top:.6vh; max-width:62ch; line-height:1.5;}
+
+.grille-2{display:grid; grid-template-columns:1fr 1fr; gap:2vw;}
+.bloc-carte{background:var(--eau-profonde); border:1px solid rgba(127,180,194,.18); border-radius:16px; padding:2vh 1.6vw;}
+.bloc-carte h4{font-size:clamp(15px,1.35vw,19px); margin-bottom:1vh; color:var(--or-frai);}
+.bloc-carte ul{margin:0; padding-left:1.2em; color:var(--ecume); font-size:clamp(12px,1.05vw,15px); line-height:1.7;}
+.bloc-carte p{color:var(--embrun); font-size:clamp(12px,1.05vw,15px); line-height:1.6;}
+.puce-espece{display:flex; align-items:center; gap:.8em; padding:.6em 0; border-bottom:1px dashed rgba(127,180,194,.2);}
+.puce-espece svg{width:34px; height:34px; flex-shrink:0;}
+.puce-espece span{font-size:clamp(12px,1.05vw,15px);}
+
+/* ============ SUIVI / RESTAURATION (étapes) ============ */
+.etapes{display:grid; grid-template-columns:repeat(3,1fr); gap:1.6vw; height:calc(100% - 16vh);}
+.etape{background:var(--eau-profonde); border:1px solid rgba(127,180,194,.16); border-radius:16px; padding:2.2vh 1.5vw; display:flex; flex-direction:column; gap:1.2vh;}
+.etape .picto{width:48px; height:48px; border-radius:50%; background:var(--eau-mid); display:flex; align-items:center; justify-content:center;}
+.etape .picto svg{width:56%; height:56%;}
+.etape h4{font-size:clamp(15px,1.35vw,20px);}
+.etape p{font-size:clamp(12px,1.05vw,15px); color:var(--embrun); line-height:1.55;}
+.etape .partenaire{margin-top:auto; font-family:var(--font-mono); font-size:clamp(9px,.72vw,11px); color:var(--cuivre); letter-spacing:.08em; text-transform:uppercase;}
+
+.pied-partenaires{position:absolute; bottom:calc(var(--nav-h) + 1.6vh); left:4vw; font-family:var(--font-mono); font-size:clamp(9px,.72vw,11px); color:var(--eau-claire); letter-spacing:.05em;}
+
+/* ============ CARTE DES STATIONS ============ */
+.carte-layout{padding:0 4vw; height:calc(100% - 13vh); display:grid; grid-template-columns:1.2fr 1fr; gap:2.6vw; align-items:start;}
+.carte-map-wrap{height:100%; display:flex; flex-direction:column;}
+.carte-svg-holder{position:relative; width:100%; flex:1; min-height:0;}
+.carte-svg-holder svg{position:absolute; inset:0; width:100%; height:100%;}
+.carte-pins{position:absolute; inset:0;}
+.pin{position:absolute; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:.4vh; padding:.6em;}
+.pin-point{width:clamp(20px,2.2vw,32px); height:clamp(20px,2.2vw,32px); border-radius:50%; background:var(--or-frai); border:3px solid var(--eau-nuit); box-shadow:0 0 0 5px rgba(233,189,84,.22); transition: all .2s ease;}
+.pin:hover .pin-point, .pin:active .pin-point{transform:scale(1.15);}
+.pin.actif .pin-point{background:var(--cuivre); box-shadow:0 0 0 6px rgba(211,135,63,.28);}
+.pin-label{font-family:var(--font-mono); font-size:clamp(9px,.72vw,11.5px); color:var(--ecume); background:rgba(7,28,36,.8); padding:.25em .7em; border-radius:6px; white-space:nowrap; border:1px solid rgba(127,180,194,.25);}
+.carte-legende{display:flex; gap:1.6vw; margin-top:1.2vh; font-family:var(--font-mono); font-size:clamp(9px,.78vw,12px); color:var(--embrun);}
+.carte-legende span{display:flex; align-items:center; gap:.5em;}
+.puce-legende{width:10px; height:10px; border-radius:50%; background:var(--or-frai); display:inline-block;}
+.puce-legende.cuivre{background:var(--cuivre);}
+.station-live{margin:1.6vh 0;}
+.station-live iframe{width:100%; aspect-ratio:16/9; border:none; border-radius:12px; border:1px solid rgba(127,180,194,.25);}
+.live-label{font-family:var(--font-mono); font-size:clamp(10px,.85vw,13px); color:var(--alerte); margin-bottom:.6vh; letter-spacing:.05em;}
+.detail-placeholder{display:flex; flex-direction:column; align-items:flex-start; gap:1.2vh; padding-top:6vh; color:var(--embrun);}
+.detail-placeholder .picto-grand{font-size:clamp(32px,3.2vw,48px);}
+
+/* ============ ESPACE JEUNES PUBLICS ============ */
+.memory-info{font-family:var(--font-mono); font-size:clamp(12px,1.05vw,15px); color:var(--or-frai); margin-bottom:1.6vh; letter-spacing:.04em;}
+.memory-grille{display:grid; grid-template-columns:repeat(6,1fr); gap:.9vw; max-width:1000px;}
+.memory-carte{aspect-ratio:3/4; border-radius:12px; background:var(--eau-mid); display:flex; align-items:center; justify-content:center; border:2px solid rgba(127,180,194,.22); transition: background .25s, transform .15s, border-color .25s;}
+.memory-carte:active{transform:scale(.94);}
+.memory-carte.retournee{background:var(--eau-profonde); border-color:var(--or-frai);}
+.memory-carte.trouvee{background:rgba(233,189,84,.1); border-color:var(--or-frai); opacity:.8;}
+.memory-carte .dos{font-size:clamp(20px,2.2vw,30px); color:var(--embrun);}
+.memory-carte .face{display:none; flex-direction:column; align-items:center; padding:.4em;}
+.memory-carte.retournee .dos, .memory-carte.trouvee .dos{display:none;}
+.memory-carte.retournee .face, .memory-carte.trouvee .face{display:flex;}
+.memory-carte .face svg{width:70%; height:auto;}
+.memory-carte .face b{font-family:var(--font-mono); font-weight:500; font-size:.58em; margin-top:.3em; text-align:center; color:var(--ecume); line-height:1.15;}
+.btn-jeu{margin-top:2vh; font-family:var(--font-mono); font-size:clamp(11px,1vw,14px); color:var(--eau-nuit); background:var(--or-frai); border-radius:100px; padding:.9em 1.8em; letter-spacing:.05em;}
+
+.lab-intro{color:var(--embrun); font-size:clamp(12px,1.05vw,15px); max-width:72ch; margin-bottom:2vh; line-height:1.55;}
+.lab-layout{display:flex; gap:3vw; align-items:flex-start;}
+.lab-grille{display:grid; grid-template-columns:repeat(5,1fr); gap:3px; width:min(34vh,26vw); aspect-ratio:5/14; background:var(--eau-nuit); border:2px solid var(--eau-mid); border-radius:10px; padding:5px;}
+.lab-cell{border-radius:3px; display:flex; align-items:center; justify-content:center; position:relative;}
+.lab-cell.fermee{background:#04141A;}
+.lab-cell.ouverte{background:var(--eau-mid);}
+.lab-cell.but{background:rgba(233,189,84,.32);}
+.lab-cell.depart{background:rgba(127,180,194,.28);}
+.lab-cell .occupant{width:76%; height:76%;}
+.lab-controles{display:flex; flex-direction:column; align-items:center; gap:1.1vh; padding-top:1vh;}
+.lab-ligne{display:flex; gap:1.1vh;}
+.lab-btn{width:clamp(48px,4.6vw,68px); height:clamp(48px,4.6vw,68px); border-radius:14px; background:var(--eau-profonde); border:1px solid rgba(127,180,194,.3); font-size:clamp(18px,1.9vw,25px); color:var(--or-frai);}
+.lab-btn:active{background:var(--eau-mid);}
+.lab-reset{margin-top:2.2vh; font-family:var(--font-mono); font-size:clamp(11px,1vw,14px); color:var(--embrun); border:1px solid var(--eau-mid); padding:.9em 1.6em; border-radius:100px; white-space:nowrap;}
+.lab-victoire{margin-top:1.6vh; font-family:var(--font-mono); color:var(--or-frai); font-size:clamp(13px,1.1vw,16px);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ================= ECRAN DE VEILLE ================= -->
+  <section id="veille" class="screen active">
+    <div class="eau-fx"><svg viewBox="0 0 1000 600" preserveAspectRatio="none">
+      <path class="ligne-eau" d="M0,120 C250,80 750,160 1000,110"/>
+      <path class="ligne-eau" d="M0,260 C300,220 700,300 1000,250"/>
+      <path class="ligne-eau" d="M0,420 C280,470 720,380 1000,430"/>
+    </svg></div>
+    <div class="veille-poissons" id="veille-poissons"></div>
+    <div class="veille-centre">
+      <span class="veille-eyebrow">Seinoscope · Poses · Passe à poissons</span>
+      <h1 class="veille-titre">Sur la piste des<br><em>poissons migrateurs</em><br>de la Seine</h1>
+      <p class="veille-sous">Saumons, aloses, lamproies et anguilles remontent ou redescendent le fleuve juste sous vos pieds. Touchez l'écran pour partir à leur rencontre.</p>
+      <button class="veille-cta tap" onclick="allerA('accueil')">Toucher pour commencer →</button>
+    </div>
+  </section>
+
+  <!-- ================= ACCUEIL ================= -->
+  <section id="accueil" class="screen">
+    <div class="entete">
+      <div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+    </div>
+    <div class="accueil-corps">
+      <div class="accueil-intro">
+        <h1>Que voulez-vous explorer ?</h1>
+        <p>Le SEINOSCOPE observe, sous le niveau de l'eau, les poissons qui franchissent le barrage de Poses. Choisissez un thème pour commencer.</p>
+      </div>
+      <div class="menu-grille">
+        <button class="carte-menu tap" onclick="allerA('poissons')">
+          <span class="num"></span>
+          <h3>Les poissons migrateurs</h3>
+          <span class="desc">Six espèces qui voyagent entre mer et rivière</span>
+          <span class="fleche">→</span>
+        </button>
+        <button class="carte-menu tap" onclick="allerA('seine')">
+          <span class="num"></span>
+          <h3>La Seine,d'hier à aujourd'hui</h3>
+          <span class="desc">Deux regards : historique et scientifique</span>
+          <span class="fleche">→</span>
+        </button>
+        <button class="carte-menu tap" onclick="allerA('suivi')">
+          <span class="num"></span>
+          <h3>Le suivi scientifique</h3>
+          <span class="desc">Vidéo-comptage et piégeage anguille en direct</span>
+          <span class="fleche">→</span>
+        </button>
+        <button class="carte-menu tap" onclick="allerA('restauration')">
+          <span class="num"></span>
+          <h3>Restaurer le fleuve</h3>
+          <span class="desc">Passes à poissons et continuité écologique</span>
+          <span class="fleche">→</span>
+        </button>
+        <button class="carte-menu tap" onclick="allerA('carte')">
+          <span class="num"></span>
+          <h3>La carte des stations</h3>
+          <span class="desc">Barrages et stations de comptage sur la Seine, l'Oise et la Marne</span>
+          <span class="fleche">→</span>
+        </button>
+        <button class="carte-menu tap" onclick="allerA('jeunes')">
+          <span class="num"></span>
+          <h3>Espace jeunes publics</h3>
+          <span class="desc">Memory des poissons et labyrinthe de l'anguille</span>
+          <span class="fleche">→</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= POISSONS ================= -->
+  <section id="poissons" class="screen">
+    <div class="entete">
+      <div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+      <button class="btn-accueil tap" onclick="allerA('accueil')">⌂ Accueil</button>
+    </div>
+
+    <div class="vue-liste">
+      <div class="section-titre">
+        <h1>Les poissons migrateurs</h1>
+        <p class="sub">Touchez une espèce pour découvrir sa fiche d'identité</p>
+      </div>
+      <div class="grille-poissons" id="grille-poissons"></div>
+    </div>
+
+    <div class="vue-fiche">
+      <button class="retour-liste tap" onclick="fermerFiche()">← Toutes les espèces</button>
+      <div class="fiche-corps" id="fiche-corps"></div>
+    </div>
+  </section>
+
+  <!-- ================= LA SEINE : HISTORIQUE / SCIENTIFIQUE ================= -->
+  <section id="seine" class="screen">
+    <div class="entete">
+      <div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+      <button class="btn-accueil tap" onclick="allerA('accueil')">⌂ Accueil</button>
+    </div>
+    <div style="padding:0 4vw; height:calc(100% - 13vh);">
+      <div class="section-titre">
+        <h1>La Seine, deux regards</h1>
+        <p class="sub">Un même fleuve, vu par l'histoire et vu par la science</p>
+      </div>
+      <div class="onglets">
+        <button class="onglet actif tap" data-onglet="historique" onclick="choisirOnglet('historique')">Regard historique</button>
+        <button class="onglet tap" data-onglet="scientifique" onclick="choisirOnglet('scientifique')">Regard scientifique</button>
+      </div>
+
+      <div class="panneau-onglet actif" id="onglet-historique">
+        <div class="frise">
+          <div class="frise-item">
+            <span class="periode">Avant l'industrialisation</span>
+            <h4>Un fleuve libre</h4>
+            <p>La Seine coule sans grand obstacle : saumons, aloses et lamproies remontent librement depuis la Manche jusqu'aux frayères de l'amont, parfois à des centaines de kilomètres de l'estuaire.</p>
+          </div>
+          <div class="frise-item">
+            <span class="periode">XIXe – XXe siècle</span>
+            <h4>Le temps des barrages</h4>
+            <p>Pour la navigation, l'industrie et l'énergie, le fleuve se couvre de barrages et d'écluses, dont celui de Poses. Chaque ouvrage devient un obstacle que les poissons migrateurs ne savent plus franchir.</p>
+          </div>
+          <div class="frise-item">
+            <span class="periode">Fin du XXe siècle</span>
+            <h4>Le déclin des migrateurs</h4>
+            <p>Obstacles infranchissables, pollutions et dégradation des habitats font chuter les populations de poissons migrateurs sur l'ensemble du bassin de la Seine.</p>
+          </div>
+          <div class="frise-item">
+            <span class="periode">Depuis 2008</span>
+            <h4>La reconquête du fleuve</h4>
+            <p>Une première passe à poissons et un vidéo-comptage sont mis en service à Poses en 2008, complétés par une rampe à anguilles en 2014 puis par une seconde passe, en rive droite, achevée en 2017.</p>
+          </div>
+          <div class="frise-item">
+            <span class="periode">Aujourd'hui</span>
+            <h4>Observer pour mieux protéger</h4>
+            <p>Le SEINOSCOPE donne à voir, en direct et sous l'eau, ce travail de restauration mené par la Fédération de Pêche de l'Eure, SEINORMIGR et le Syndicat de Léry-Poses, en lien avec le réseau de stations STACOMI du bassin.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panneau-onglet" id="onglet-scientifique">
+        <div class="grille-2">
+          <div class="bloc-carte">
+            <h4>Espèces suivies à Poses</h4>
+            <div id="liste-especes-sci"></div>
+          </div>
+          <div class="bloc-carte">
+            <h4>Actions de restauration en cours</h4>
+            <ul>
+              <li>Deux passes à poissons sur le barrage de Poses (rive gauche depuis 2008, rive droite depuis 2017)</li>
+              <li>Rampe à anguilles dédiée à la montaison des civelles et anguillettes</li>
+              <li>Vidéo-comptage en continu de chaque poisson franchissant l'ouvrage</li>
+              <li>Piégeage et biométrie des anguilles pour suivre la population</li>
+              <li>Extension du réseau de stations de comptage vers Pontoise (Oise) et Maisons-Alfort (Marne)</li>
+            </ul>
+            <p style="margin-top:1.4vh;">Voir le détail de chaque station dans la rubrique <strong>« La carte des stations »</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SUIVI SCIENTIFIQUE ================= -->
+  <section id="suivi" class="screen">
+    <div class="entete">
+      <div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+      <button class="btn-accueil tap" onclick="allerA('accueil')">⌂ Accueil</button>
+    </div>
+    <div style="padding:0 4vw; height:calc(100% - 13vh);">
+      <div class="section-titre">
+        <h1>Le suivi scientifique</h1>
+        <p class="sub">Ce que fait SEINORMIGR juste derrière la vitre</p>
+      </div>
+      <div class="etapes">
+        <div class="etape">
+          <div class="picto">🎥</div>
+          <h4>Le vidéo-comptage</h4>
+          <p>Une caméra filme en continu l'intérieur de la passe à poissons à travers une vitre. Quand un poisson passe devant la caméra elle enregistre une séquence qui permettra lors du visionnage des vidéos de compter et mesurer, chaque espèce.</p>
+
+
+          <img src="https://www.seinormigr.fr/msmedias/outils/stacomi/presentation/video-comptage_JPG.jpg"width="650" height="420"alt="Vidéo-comptage Poses rive gauche">
+          <span class="partenaire">SEINORMIGR</span>
+        </div>
+        <div class="etape">
+          <div class="picto">🪤</div>
+          <h4>Le piégeage anguille</h4>
+          <p>Sur la rampe dédiée, un piège capture les anguilles en montaison.Trois fois par semaine le piège est relevé et les jeune anguille pesées, mesurées et dénombrées. Chaque mercredi de mai à août, la relève du piège et la biométrie sont réalisées devant le public.</p>
+          <img src="https://seinormigr.sharepoint.com/:i:/s/Seine-NormandieMigrateurs/IQCN7Uc4wDuBQaVED1grecF4AVEU9lJjtWO3F9jiAFWXy4U?e=ZIrr2g"width="650" height="420" alt="rampe/piège à anguille Poses rive gauche">
+
+
+          <span class="partenaire">SEINORMIGR</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESTAURATION ================= -->
+  <section id="restauration" class="screen">
+    <div class="entete">
+      <div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+      <button class="btn-accueil tap" onclick="allerA('accueil')">⌂ Accueil</button>
+    </div>
+    <div style="padding:0 4vw; height:calc(100% - 13vh);">
+      <div class="section-titre">
+        <h1>Restaurer le fleuve</h1>
+        <p class="sub">Redonner aux poissons migrateurs le chemin de leurs frayères</p>
+      </div>
+      <div class="etapes">
+        <div class="etape">
+          <div class="picto">🐟</div>
+          <h4>Passe à poissons</h4>
+          <p>Un dispositif en escalier de bassins successifs permet aux poissons de franchir le barrage de Poses malgré la différence de niveau d'eau, en dépensant le moins d'énergie possible.</p>
+          <span class="partenaire">Syndicat de Léry-Poses</span>
+        </div>
+        <div class="etape">
+          <div class="picto">🌱</div>
+          <h4>Continuité écologique</h4>
+          <p>Au-delà de Poses, chaque obstacle du bassin est étudié pour être rendu franchissable, afin que les migrateurs puissent remonter jusqu'à leurs zones de frai historiques, sur la Seine, l'Oise ou la Marne.</p>
+          <span class="partenaire">FD27</span>
+        </div>
+        <div class="etape">
+          <div class="picto">🤝</div>
+          <h4>Un projet partagé</h4>
+          <p>Le Syndicat de Léry-Poses met le lieu à disposition, la Fédération de Pêche de l'Eure porte le réaménagement, SEINORMIGR anime le suivi scientifique face au public.</p>
+          <span class="partenaire">Poses · Eure</span>
+        </div>
+      </div>
+      <p class="pied-partenaires">Fédération Départementale de Pêche et de Protection des Milieux Aquatiques de l'Eure · SEINORMIGR · Syndicat Mixte de la Base de Plein Air et de Loisirs de Léry-Poses</p>
+    </div>
+  </section>
+
+  <!-- ================= CARTE DES STATIONS ================= -->
+  <section id="carte" class="screen">
+    <div class="entete">
+      <div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+      <button class="btn-accueil tap" onclick="allerA('accueil')">⌂ Accueil</button>
+    </div>
+    <div class="carte-layout">
+      <div class="carte-map-wrap">
+        <div class="section-titre" style="margin-bottom:1.2vh;">
+          <h1>Les stations de contrôle</h1>
+          <p class="sub">Touchez un point pour découvrir la station</p>
+        </div>
+        <div class="carte-svg-holder">
+          <svg viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" aria-label="Schéma des cours d'eau et stations de contrôle">
+            <!-- Seine : axe principal, de la mer vers l'amont -->
+            <path d="M35,420 C150,414 205,420 265,422 C310,424 340,405 385,405 C420,405 445,430 480,438 C555,455 620,425 690,402 C775,375 855,365 965,350" stroke="var(--eau-claire)" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.85"/>
+            <!-- Oise : descend vers la Seine depuis le nord -->
+            <path d="M250,35 C265,65 270,95 270,135 C270,200 265,265 265,330 C265,365 275,390 300,415" stroke="var(--eau-mid)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.85"/>
+            <!-- Aisne : affluent de l'Oise, vers l'est -->
+            <path d="M265,92 C350,78 430,62 520,48 C610,35 700,35 820,35" stroke="var(--eau-mid)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.85"/>
+            <!-- Marne : affluent de la Seine, vers le sud-est -->
+            <path d="M480,438 C485,500 495,555 510,615 C525,680 555,735 585,790" stroke="var(--eau-mid)" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.85"/>
+
+            <text x="55" y="395" fill="var(--embrun)" font-family="IBM Plex Mono, monospace" font-size="15">↞ vers la mer</text>
+            <text x="800" y="335" fill="var(--limon)" font-family="IBM Plex Mono, monospace" font-size="15">vers l'amont ↠</text>
+            <text x="325" y="18" fill="var(--embrun)" font-family="IBM Plex Mono, monospace" font-size="15" font-style="italic">Oise</text>
+            <text x="525" y="28" fill="var(--embrun)" font-family="IBM Plex Mono, monospace" font-size="13" font-style="italic">Aisne</text>
+            <text x="520" y="620" fill="var(--embrun)" font-family="IBM Plex Mono, monospace" font-size="15" font-style="italic">Marne</text>
+            <text x="380" y="395" fill="var(--ecume)" font-family="Fraunces, serif" font-size="16" opacity="0.7">Paris</text>
+            <text x="45" y="445" fill="var(--ecume)" font-family="Fraunces, serif" font-size="16" opacity="0.85">Seine</text>
+          </svg>
+          <div class="carte-pins">
+            <!-- Positions recalées sur le nouveau tracé -->
+            <button type="button" class="pin tap" style="left:8%; top:52.5%;" data-id="poses-rg" onclick="afficherStation('poses-rg')"><span class="pin-point"></span><span class="pin-label">Poses RG</span></button>
+            <button type="button" class="pin tap" style="left:12%; top:55%;" data-id="poses-rd" onclick="afficherStation('poses-rd')"><span class="pin-point"></span><span class="pin-label">Poses RD</span></button>
+            <button type="button" class="pin tap" style="left:27%; top:14.5%;" data-id="pontoise" onclick="afficherStation('pontoise')"><span class="pin-point"></span><span class="pin-label">Pontoise · Oise</span></button>
+            <button type="button" class="pin tap" style="left:31%; top:9.5%;" data-id="choisy-au-bac" onclick="afficherStation('choisy-au-bac')"><span class="pin-point"></span><span class="pin-label">Choisy-au-Bac · Aisne</span></button>
+            <button type="button" class="pin tap" style="left:48%; top:55%;" data-id="maisons-alfort" onclick="afficherStation('maisons-alfort')"><span class="pin-point"></span><span class="pin-label">Maisons-Alfort · Marne</span></button>
+          </div>
+        </div>
+        <div class="carte-legende">
+          <span><span class="puce-legende"></span> Station en fonctionnement</span>
+          <span><span class="puce-legende cuivre"></span> Station sélectionnée</span>
+        </div>
+      </div>
+      <div class="fiche-texte" id="station-detail"></div>
+    </div>
+  </section>
+
+  <!-- ================= ESPACE JEUNES PUBLICS ================= -->
+  <section id="jeunes" class="screen">
+    <div class="entete">
+      <div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+      <button class="btn-accueil tap" onclick="allerA('accueil')">⌂ Accueil</button>
+    </div>
+    <div style="padding:0 4vw; height:calc(100% - 13vh);">
+      <div class="section-titre">
+        <h1>Espace jeunes publics</h1>
+        <p class="sub">Deux jeux pour découvrir les poissons migrateurs en s'amusant</p>
+      </div>
+      <div class="onglets">
+        <button class="onglet actif tap" data-jeu="memory" onclick="choisirJeu('memory')">🧠 Memory des poissons</button>
+        <button class="onglet tap" data-jeu="labyrinthe" onclick="choisirJeu('labyrinthe')">🐍 Labyrinthe de l'anguille</button>
+      </div>
+
+      <div class="panneau-onglet actif" id="jeu-memory">
+        <p class="memory-info" id="memory-info">Coups : 0 · Paires trouvées : 0 / 6</p>
+        <div class="memory-grille" id="memory-grille"></div>
+        <button class="btn-jeu tap" onclick="initMemory()">🔄 Nouvelle partie</button>
+      </div>
+
+      <div class="panneau-onglet" id="jeu-labyrinthe">
+        <p class="lab-intro">Comme à la station de Pontoise, la passe à poissons est faite de bassins successifs reliés par une étroite fente, tantôt à gauche, tantôt à droite. Guidez l'anguille depuis la mer, en bas, jusqu'aux frayères de l'amont, en haut.</p>
+        <div class="lab-layout">
+          <div class="lab-grille" id="lab-grille"></div>
+          <div class="lab-controles">
+            <button class="lab-btn tap" onclick="deplacerAnguille(0,1)">▲</button>
+            <div class="lab-ligne">
+              <button class="lab-btn tap" onclick="deplacerAnguille(-1,0)">◀</button>
+              <button class="lab-btn tap" onclick="deplacerAnguille(1,0)">▶</button>
+            </div>
+            <button class="lab-btn tap" onclick="deplacerAnguille(0,-1)">▼</button>
+            <button class="lab-reset tap" onclick="initLabyrinthe()">🔄 Recommencer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NAV RIVIERE (barre du bas) ================= -->
+  <nav id="riviere-nav">
+    <span class="rn-label mer">← Mer</span>
+    <div class="rn-piste">
+      <svg viewBox="0 0 1000 60" preserveAspectRatio="none"><path d="M0,30 C200,10 350,50 500,30 C650,10 800,50 1000,30" stroke="rgba(127,180,194,.35)" stroke-width="2" fill="none" stroke-dasharray="2 8" stroke-linecap="round"/></svg>
+      <div id="rn-fishes" style="position:relative; z-index:2; display:flex; justify-content:space-between; width:100%;"></div>
+    </div>
+    <span class="rn-label amont">Amont / frayères →</span>
+  </nav>
+
+</div>
+
+<script>
+/* ============================================================
+   DONNEES DES ESPECES
+   Sources : fiches espèces www.seinormigr.fr (contenus reformulés)
+   ============================================================ */
+// photo = URL directe du fichier image hébergé par SEINORMIGR.
+// photoPage = page officielle de l'espèce (utilisée comme référence si la photo directe n'est pas renseignée).
+const POISSONS = [
+  {
+    id:'saumon', nom:'Saumon atlantique', photos:['photos/saumon/saumon-01.jpg', 'photos/saumon/saumon-02.jpg', 'photos/saumon/saumon-03.jpg', 'photos/saumon/saumon-04.jpg', 'photos/saumon/saumon-05.jpg', 'photos/saumon/saumon-06.jpg', 'photos/saumon/saumon-07.jpg', 'photos/saumon/saumon-08.jpg'], photoPage:'https://www.seinormigr.fr/fr/saumon-atlantique-7036', latin:'Salmo salar', sens:'anadrome',
+    taille:'jusqu\u2019à 1 m', poids:'jusqu\u2019à une vingtaine de kg', statut:'Quasi menacé en France (UICN)',
+    cycle:'Né en rivière, le jeune saumon dévale vers la mer où il grossit au large du Groenland ou des îles Féroé. Devenu adulte, il retrouve en général sa rivière natale pour s\u2019y reproduire grâce à sa mémoire olfactive, et la grande majorité des géniteurs meurent après le frai.',
+    anecdote:'Selon la durée de son séjour en mer, on distingue le castillon (1 hiver en mer, 45 à 75 cm), le saumon de printemps (2 hivers, 75 à 90 cm) et le grand saumon de printemps (3 hivers, plus de 90 cm). Quelques saumons sont comptés chaque année à Poses, mais aucune reproduction naturelle n\u2019est encore connue en amont de l\u2019estuaire.',
+    couleur:'#8FB8C9', forme:'torpille', tache:'#3B4A52',
+    source:'https://www.seinormigr.fr/fr/saumon-atlantique-7036', dashboard:'https://www.seinormigr.fr/fr/tableau-bord-sat-0996'
+  },
+  {
+    id:'truite-mer', nom:'Truite de mer', photos:['photos/truite-mer/truite-mer-01.jpg', 'photos/truite-mer/truite-mer-02.jpg', 'photos/truite-mer/truite-mer-03.jpg', 'photos/truite-mer/truite-mer-04.jpg', 'photos/truite-mer/truite-mer-05.jpg', 'photos/truite-mer/truite-mer-06.jpg', 'photos/truite-mer/truite-mer-07.jpg', 'photos/truite-mer/truite-mer-08.jpg', 'photos/truite-mer/truite-mer-09.jpg'], photoPage:'https://www.seinormigr.fr/fr/truite-de-mer-e71d', latin:'Salmo trutta trutta', sens:'anadrome',
+    taille:'jusqu\u2019à 1 m', poids:'jusqu\u2019à une dizaine de kg', statut:'Préoccupation mineure en France (UICN)',
+    cycle:'Cousine du saumon, la truite de mer est un « écotype » migrateur de la truite commune : certains individus partent grossir en mer, d\u2019autres restent sédentaires en rivière. Contrairement au saumon, une bonne partie des géniteurs survit au frai et peut se reproduire plusieurs fois au cours de sa vie.',
+    anecdote:'Chez les juvéniles migrateurs, environ trois sur quatre sont des femelles : une stratégie qui permet aux géniteurs de revenir plus grands et de pondre davantage d\u2019œufs. Dans la Seine, la truite de mer est comptée en plus grand nombre que le saumon, avec des remontées observées jusqu\u2019à 450 km de la mer.',
+    couleur:'#A9C6B6', forme:'torpille', tache:'#4A5A3E',
+    source:'https://www.seinormigr.fr/fr/truite-de-mer-e71d', dashboard:'https://www.seinormigr.fr/fr/tableau-bord-truite-mer-df09'
+  },
+  {
+    id:'alose', nom:'Grande alose', photos:['photos/alose/alose-01.jpg', 'photos/alose/alose-02.jpg', 'photos/alose/alose-03.jpg', 'photos/alose/alose-04.jpg', 'photos/alose/alose-05.jpg', 'photos/alose/alose-06.jpg', 'photos/alose/alose-07.jpg', 'photos/alose/alose-08.jpg', 'photos/alose/alose-09.jpg', 'photos/alose/alose-10.jpg', 'photos/alose/alose-11.jpg'], photoPage:'https://www.seinormigr.fr/fr/grande-alose-0d85', latin:'Alosa alosa', sens:'anadrome',
+    taille:'poisson argenté proche de la sardine', poids:'—', statut:'En danger critique d\u2019extinction en France (UICN)',
+    cycle:'Après 3 à 7 ans passés en mer à se nourrir de zooplancton, la grande alose remonte la Seine dès que l\u2019eau atteint 10 à 15°C. La ponte, nocturne, s\u2019accompagne d\u2019un tourbillon bruyant de surface appelé le « bull ». Presque tous les géniteurs meurent après la reproduction.',
+    anecdote:'2020 a été une année record avec près de 3500 aloses comptées à la station de Poses rive droite (Amfreville-sous-les-Monts). Des cas de reproduction ont même été repérés jusqu\u2019à 400-500 km de la mer, sur la Marne et sur la Seine en amont de Paris.',
+    couleur:'#C9CFC0', forme:'alose', tache:'#39424A',
+    source:'https://www.seinormigr.fr/fr/grande-alose-0d85', dashboard:'https://www.seinormigr.fr/fr/tableau-bord-alose-c86a'
+  },
+  {
+    id:'lamproie-marine', nom:'Lamproie marine', photos:['photos/lamproie-marine/lamproie-marine-01.jpg', 'photos/lamproie-marine/lamproie-marine-02.jpg', 'photos/lamproie-marine/lamproie-marine-03.jpg', 'photos/lamproie-marine/lamproie-marine-04.jpg', 'photos/lamproie-marine/lamproie-marine-05.jpg', 'photos/lamproie-marine/lamproie-marine-06.jpg', 'photos/lamproie-marine/lamproie-marine-07.jpg'], photoPage:'https://www.seinormigr.fr/fr/lamproie-marine-a53d', latin:'Petromyzon marinus', sens:'anadrome',
+    taille:'environ 80 cm, jusqu\u2019à 1,20 m', poids:'jusqu\u2019à 2 kg', statut:'En danger en France (UICN)',
+    cycle:'Dépourvue de mâchoires, la lamproie marine se fixe sur d\u2019autres poissons grâce à un disque buccal ventousé pour s\u2019en nourrir en mer. Ses larves, les ammocètes, restent enfouies 5 à 7 ans dans les sédiments avant de gagner la mer. Tous les géniteurs meurent après le frai.',
+    anecdote:'Poses accueille la population de lamproies marines la plus importante du bassin Seine-Normandie, avec en moyenne plus de 2000 individus comptés chaque année à la sortie de l\u2019estuaire. Son devenir une fois le barrage franchi reste toutefois encore largement méconnu.',
+    couleur:'#8A7A5C', forme:'anguilliforme', tache:'#5C4A32',
+    source:'https://www.seinormigr.fr/fr/lamproie-marine-a53d', dashboard:'https://www.seinormigr.fr/fr/tableau-de-bord-lamproie-marine-f55f'
+  },
+  {
+    id:'lamproie-fluviatile', nom:'Lamproie fluviatile', photos:['photos/lamproie-fluviatile/lamproie-fluviatile-01.jpg', 'photos/lamproie-fluviatile/lamproie-fluviatile-02.jpg', 'photos/lamproie-fluviatile/lamproie-fluviatile-03.jpg', 'photos/lamproie-fluviatile/lamproie-fluviatile-04.jpg', 'photos/lamproie-fluviatile/lamproie-fluviatile-05.jpg', 'photos/lamproie-fluviatile/lamproie-fluviatile-06.jpg', 'photos/lamproie-fluviatile/lamproie-fluviatile-07.jpg', 'photos/lamproie-fluviatile/lamproie-fluviatile-08.jpg', 'photos/lamproie-fluviatile/lamproie-fluviatile-09.jpg'], photoPage:'https://www.seinormigr.fr/fr/lamproie-fluviatile-faf3', latin:'Lampetra fluviatilis', sens:'anadrome',
+    taille:'25 à 35 cm', poids:'quelques dizaines de grammes', statut:'Vulnérable en France (UICN)',
+    cycle:'Plus petite que sa cousine marine, la lamproie fluviatile suit un cycle très proche : des ammocètes enfouies 3 à 6 ans dans la vase, puis une croissance marine parasite avant la remontée et la reproduction, toutes deux nocturnes.',
+    anecdote:'Ses capacités de franchissement sont plus limitées que celles de la lamproie marine : l\u2019espèce reste surtout présente sur les parties basses des cours d\u2019eau. C\u2019est sur la Seine et ses affluents estuariens qu\u2019elle est la plus abondante du bassin.',
+    couleur:'#8FA0AE', forme:'anguilliforme', tache:'#42525C',
+    source:'https://www.seinormigr.fr/fr/lamproie-fluviatile-faf3', dashboard:'https://www.seinormigr.fr/fr/tableau-bord-lamproie-fluviatile-496b'
+  },
+  {
+    id:'anguille', nom:'Anguille européenne', photos:['photos/anguille/anguille-01.jpg', 'photos/anguille/anguille-02.jpg', 'photos/anguille/anguille-03.jpg', 'photos/anguille/anguille-04.jpg', 'photos/anguille/anguille-05.jpg', 'photos/anguille/anguille-06.jpg', 'photos/anguille/anguille-07.jpg', 'photos/anguille/anguille-08.jpg', 'photos/anguille/anguille-09.jpg', 'photos/anguille/anguille-10.jpg', 'photos/anguille/anguille-11.jpg', 'photos/anguille/anguille-12.jpg'], photoPage:'https://www.seinormigr.fr/fr/l-anguille-europeenne-6bca', latin:'Anguilla anguilla', sens:'catadrome',
+    taille:'20 à 45 cm (mâles), 35 cm à plus d\u20191 m (femelles)', poids:'jusqu\u2019à 1 kg', statut:'En danger critique d\u2019extinction (UICN)',
+    cycle:'Née en mer des Sargasses, la civelle traverse l\u2019Atlantique puis colonise la Seine, où elle grandit plusieurs années (3 à 9 ans pour les mâles, 5 à 18 ans pour les femelles) avant de « s\u2019argenter » et de redescendre, sans se nourrir, vers son lieu de naissance pour s\u2019y reproduire et y mourir.',
+    anecdote:'C\u2019est la seule espèce du parcours à migrer en sens inverse des autres, de la rivière vers la mer. À la rampe de Poses rive droite, jusqu\u2019à 476 570 anguilles ont été comptées sur une seule saison, avec des pointes proches de 80 000 individus en une journée au plus chaud de l\u2019été.',
+    couleur:'#C9A25C', forme:'anguilliforme', tache:'#7A5A28',
+    source:'https://www.seinormigr.fr/fr/l-anguille-europeenne-6bca', dashboard:'https://www.seinormigr.fr/fr/tableau-bord-anguille-a736'
+  }
+];
+
+/* ============================================================
+   DONNEES DES STATIONS DE CONTROLE (STACOMI)
+   Sources : www.seinormigr.fr — pages de chaque station (contenus reformulés)
+   ============================================================ */
+const STATIONS = [
+  {
+    id:'poses-rg', nom:'Poses — rive gauche', riviere:'Seine',
+    distance:'≈ 160 km de la mer', depuis:'Vidéo-comptage depuis 2008 · piège à anguilles depuis 2014',
+    gestion:'Syndicat de Léry-Poses · SEINORMIGR',
+    desc:'Le barrage de Poses marque la limite de l\u2019estuaire de la Seine : la marée s\u2019y fait encore sentir, et l\u2019ouvrage reste la première porte d\u2019entrée pour tous les migrateurs qui souhaitent continuer vers l\u2019amont. La passe historique, en rive gauche, est installée du côté de la centrale hydroélectrique.',
+    chiffre:'Espèce la mieux suivie ici : la lamproie marine. Depuis 2008, les effectifs comptés chaque année varient entre 454 et près de 4900 individus — la population la plus importante du bassin Seine-Normandie.',
+    url:'https://www.seinormigr.fr/fr/station-controle-migrations-poses-cd3b'
+  },
+  {
+    id:'poses-rd', nom:'Poses — rive droite (Amfreville-sous-les-Monts)', riviere:'Seine',
+    distance:'≈ 160 km de la mer', depuis:'Passe achevée en 2017 · vidéo-comptage et piège à anguilles depuis 2018',
+    gestion:'SEINORMIGR (ouvrage Voies Navigables de France)',
+    desc:'Construite par Voies Navigables de France en complément de la passe historique de rive gauche, cette seconde passe a nettement augmenté les possibilités de franchissement du barrage de Poses, aussi bien pour les poissons que pour le suivi scientifique.',
+    chiffre:'Jusqu\u2019à 476 570 anguilles comptées ici lors de la première saison de piégeage (2018), avec des arrivées massives en été pouvant dépasser 80 000 individus en une seule journée lors des pics de température.',
+    url:'https://www.seinormigr.fr/fr/station-controle-migrations-amfreville-sous-monts-78c6'
+  },
+  {
+    id:'pontoise', nom:'Pontoise', riviere:'Oise',
+    distance:'14 km de la confluence avec la Seine', depuis:'Passe à 8 bassins à fentes verticales · chute d\u2019environ 1,5 m',
+    gestion:'Voies Navigables de France · SEINORMIGR',
+    desc:'Sur cet ouvrage de navigation entre Pontoise et Saint-Ouen-l\u2019Aumône, une caméra filme en continu chaque poisson qui franchit la passe, dans un sens comme dans l\u2019autre, permettant de les identifier et de les dénombrer.',
+    chiffre:'Une caméra diffuse les passages en direct depuis la station, avec un historique des dix dernières vidéos enregistrées pour chaque espèce rencontrée sur l\u2019Oise.',
+    url:'https://www.seinormigr.fr/fr/station-controle-migrations-pontoise-9767',
+    live:true
+  },
+  {
+    id:'maisons-alfort', nom:'Maisons-Alfort', riviere:'Marne',
+    distance:'2 km de la confluence avec la Seine (plus de 350 km de la mer)', depuis:'Passe à 10 bassins équipée depuis 2009 · chute d\u2019environ 1,85 m',
+    gestion:'Voies Navigables de France · SEINORMIGR', statut:'En projet — passe fonctionnelle, comptage en attente d\u2019équipement',
+    desc:'Cet ouvrage de navigation sur la Marne dispose d\u2019une chambre d\u2019observation à deux vitres : l\u2019une pour le futur dispositif de vidéo-comptage, l\u2019autre à vocation pédagogique. C\u2019est, des trois observatoires de Voies Navigables de France, le seul adapté pour accueillir du public.',
+    chiffre:'Des aménagements sont encore nécessaires avant la mise en service complète du site, qui permettra alors d\u2019observer les migrateurs remontant la Seine puis s\u2019engageant sur la Marne, à plus de 350 km de la mer.',
+    url:'https://www.seinormigr.fr/fr/station-controle-migrations-maisons-alfort-f8bc'
+  },
+  {
+    id:'choisy-au-bac', nom:'Choisy-au-Bac (barrage de Carandeau)', riviere:'Aisne',
+    distance:'plus de 450 km de la mer', depuis:'Vidéo-comptage depuis 2017',
+    gestion:'—',
+    desc:'La station de Choisy-au-Bac est située sur le barrage de Carandeau, sur l’Aisne, à seulement 2 km de sa confluence avec l’Oise. Elle permet d’identifier et de comptabiliser les espèces qui s’engagent sur l’Aisne et contribue à évaluer la recolonisation récente du bassin de l’Aisne par les poissons amphihalins.',
+    chiffre:'Les premières images de vidéocomptage en 2017 ont permis de détecter 4 saumons et 8 aloses. En 2019, 359 aloses et 5 truites de mer ont été observées sur le site.',
+    url:'https://www.seinormigr.fr/fr/station-controle-migrations-choisy-bac-f28e'
+  }
+];
+
+/* ============================================================
+   ILLUSTRATIONS SVG (silhouettes stylisées, type planche naturaliste)
+   ============================================================ */
+function svgFish(p, big){
+  if(p.forme === 'anguilliforme'){
+    return `<svg viewBox="0 0 220 90" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8,45 C30,10 70,15 95,40 C120,65 150,20 180,35 C195,42 205,44 212,45 C205,46 195,48 180,55 C150,70 120,25 95,50 C70,75 30,80 8,45 Z" fill="${p.couleur}" opacity="0.95"/>
+      <path d="M8,45 C30,10 70,15 95,40 C120,65 150,20 180,35" stroke="${p.tache}" stroke-width="2" fill="none" opacity="0.35"/>
+      <circle cx="16" cy="43" r="2.4" fill="${p.tache}"/>
+    </svg>`;
+  }
+  if(p.forme === 'alose'){
+    return `<svg viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18,60 C40,15 110,10 155,35 C185,50 205,58 214,60 C205,62 185,70 155,85 C110,110 40,105 18,60 Z" fill="${p.couleur}"/>
+      <path d="M155,35 L214,60 L155,85 Z" fill="${p.tache}" opacity="0.9"/>
+      <circle cx="34" cy="55" r="6" fill="${p.tache}" opacity="0.7"/>
+      <circle cx="52" cy="53" r="4.4" fill="${p.tache}" opacity="0.55"/>
+      <circle cx="68" cy="52" r="3.4" fill="${p.tache}" opacity="0.4"/>
+      <circle cx="28" cy="58" r="2.6" fill="#111"/>
+    </svg>`;
+  }
+  return `<svg viewBox="0 0 220 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14,50 C24,20 70,14 120,20 C160,25 190,35 210,50 C190,65 160,75 120,80 C70,86 24,80 14,50 Z" fill="${p.couleur}"/>
+    <path d="M175,30 L210,50 L175,70 Z" fill="${p.tache}" opacity="0.9"/>
+    <circle cx="150" cy="34" r="3" fill="${p.tache}" opacity="0.65"/>
+    <circle cx="130" cy="28" r="2.6" fill="${p.tache}" opacity="0.55"/>
+    <circle cx="110" cy="24" r="2.2" fill="${p.tache}" opacity="0.5"/>
+    <circle cx="140" cy="60" r="2.4" fill="${p.tache}" opacity="0.45"/>
+    <path d="M100,20 C108,10 118,8 126,12 C118,16 110,18 100,20 Z" fill="${p.couleur}" opacity="0.85"/>
+    <circle cx="24" cy="47" r="2.6" fill="#111"/>
+  </svg>`;
+}
+
+/* ============================================================
+   RENDU : accueil / grille / fiches / nav rivière
+   ============================================================ */
+function initGrillePoissons(){
+  const grille = document.getElementById('grille-poissons');
+  grille.innerHTML = POISSONS.map(p => `
+    <button class="carte-poisson tap ${p.sens==='anadrome'?'anad':'cata'}" onclick="ouvrirFiche('${p.id}')">
+      <div class="photo-espece">
+        ${p.photos && p.photos.length ? `<img src="${p.photos[0]}" alt="${p.nom}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=\"photo-fallback\">Photo indisponible</span>'">` : `<span class="photo-fallback">Photo de l'espèce<br>à intégrer depuis SEINORMIGR</span>`}
+      </div>
+      <div class="visuel">${svgFish(p,false)}</div>
+      <span class="type-tag">${p.sens === 'anadrome' ? 'Mer → Rivière' : 'Rivière → Mer'}</span>
+      <h3>${p.nom}</h3>
+      <span class="latin">${p.latin}</span>
+    </button>
+  `).join('');
+}
+
+function initListeEspecesSci(){
+  const cible = document.getElementById('liste-especes-sci');
+  cible.innerHTML = POISSONS.map(p => `
+    <div class="puce-espece">${svgFish(p,false)}<span><strong>${p.nom}</strong> — ${p.latin}</span></div>
+  `).join('');
+}
+
+function initNavRiviere(){
+  const cible = document.getElementById('rn-fishes');
+  cible.innerHTML = POISSONS.map(p => `
+    <button class="rn-fish tap ${p.sens==='catadrome'?'catadrome':''}" data-id="${p.id}" onclick="allerA('poissons'); ouvrirFiche('${p.id}');">
+      <span class="pastille">${svgFish(p,false)}</span>
+      <span class="nom-mini">${p.nom.split(' ')[0]}</span>
+    </button>
+  `).join('');
+}
+
+function ouvrirFiche(id){
+  const p = POISSONS.find(f => f.id === id);
+  if(!p) return;
+  document.getElementById('poissons').classList.add('mode-fiche');
+  document.getElementById('fiche-corps').innerHTML = `
+    <div class="fiche-visuel">
+      <div class="fiche-carousel" data-carousel-id="${p.id}">
+        <div class="carousel-main" id="carousel-main-${p.id}" data-index="0">
+          ${p.photos && p.photos.length ? `<img src="${p.photos[0]}" alt="${p.nom}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\"carousel-placeholder\\">Photo indisponible</div>'">` : `<div class="carousel-placeholder">Ajoutez vos chemins de photos dans<br><strong>photos: [ ... ]</strong> pour ${p.nom}</div>`}
+          ${p.photos && p.photos.length > 1 ? `
+            <button class="carousel-btn carousel-prev tap" aria-label="Photo précédente" onclick="changerPhoto('${p.id}',-1)">‹</button>
+            <button class="carousel-btn carousel-next tap" aria-label="Photo suivante" onclick="changerPhoto('${p.id}',1)">›</button>
+            <span class="carousel-counter" id="carousel-counter-${p.id}">1 / ${p.photos.length}</span>
+          ` : ''}
+        </div>
+        ${p.photos && p.photos.length > 1 ? `<div class="carousel-dots" id="carousel-dots-${p.id}">
+          ${p.photos.map((_,i)=>`<button class="carousel-dot ${i===0?'actif':''} tap" aria-label="Afficher la photo ${i+1}" onclick="afficherPhoto('${p.id}',${i})"></button>`).join('')}
+        </div>
+        <div class="carousel-thumbs" id="carousel-thumbs-${p.id}">
+          ${p.photos.map((src,i)=>`<button class="carousel-thumb ${i===0?'actif':''} tap" onclick="afficherPhoto('${p.id}',${i})"><img src="${src}" alt="${p.nom} — photo ${i+1}" loading="lazy"></button>`).join('')}
+        </div>` : ''}
+      </div>
+      <div class="cadre">${svgFish(p,true)}</div>
+    </div>
+    <div class="fiche-texte">
+      <span class="fiche-badge ${p.sens==='catadrome'?'cata':''}">${p.sens === 'anadrome' ? '⇡ Migrateur anadrome — mer → rivière' : '⇣ Migrateur catadrome — rivière → mer'}</span>
+      <div class="fiche-entete">
+        <h2>${p.nom}</h2>
+        <span class="latin">${p.latin}</span>
+      </div>
+      <div class="stat-grille">
+        <div class="stat"><div class="label">Taille adulte</div><div class="valeur">${p.taille}</div></div>
+        <div class="stat"><div class="label">Poids</div><div class="valeur">${p.poids}</div></div>
+        <div class="stat"><div class="label">Statut UICN</div><div class="valeur">${p.statut}</div></div>
+        <div class="stat"><div class="label">Observable au</div><div class="valeur">SEINOSCOPE, Poses</div></div>
+      </div>
+      <p class="long">${p.cycle}</p>
+      <div class="fiche-anecdote">${p.anecdote}</div>
+      <div>
+        <a class="lien-source tap" href="${p.source}" target="_blank" rel="noopener">Fiche complète sur seinormigr.fr →</a>
+        <a class="lien-source tap" href="${p.dashboard}" target="_blank" rel="noopener">Tableau de bord des passages →</a>
+      </div>
+    </div>
+  `;
+  const main = document.getElementById(`carousel-main-${p.id}`);
+  if(main && p.photos && p.photos.length > 1){
+    let touchX = null;
+    main.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, {passive:true});
+    main.addEventListener('touchend', e => {
+      if(touchX === null) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      if(Math.abs(dx) > 35) changerPhoto(p.id, dx < 0 ? 1 : -1);
+      touchX = null;
+    }, {passive:true});
+  }
+  document.querySelectorAll('.rn-fish').forEach(b => b.classList.toggle('actif', b.dataset.id === id));
+}
+
+function afficherPhoto(id, index){
+  const p = POISSONS.find(f => f.id === id);
+  if(!p || !p.photos || !p.photos.length) return;
+  index = ((index % p.photos.length) + p.photos.length) % p.photos.length;
+  const main = document.getElementById(`carousel-main-${id}`);
+  if(!main) return;
+  main.dataset.index = index;
+  const old = main.querySelector('img');
+  const src = p.photos[index];
+  if(old){
+    old.src = src;
+    old.alt = `${p.nom} — photo ${index+1}`;
+  } else {
+    main.innerHTML = `<img src="${src}" alt="${p.nom} — photo ${index+1}" loading="lazy">`;
+  }
+  const counter = document.getElementById(`carousel-counter-${id}`);
+  if(counter) counter.textContent = `${index+1} / ${p.photos.length}`;
+  document.querySelectorAll(`#carousel-dots-${id} .carousel-dot`).forEach((b,i) => b.classList.toggle('actif', i === index));
+  document.querySelectorAll(`#carousel-thumbs-${id} .carousel-thumb`).forEach((b,i) => b.classList.toggle('actif', i === index));
+  const thumb = document.querySelector(`#carousel-thumbs-${id} .carousel-thumb:nth-child(${index+1})`);
+  if(thumb) thumb.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+}
+
+function changerPhoto(id, delta){
+  const main = document.getElementById(`carousel-main-${id}`);
+  const p = POISSONS.find(f => f.id === id);
+  if(!main || !p || !p.photos || p.photos.length < 2) return;
+  const index = Number(main.dataset.index || 0);
+  afficherPhoto(id, index + delta);
+}
+
+function fermerFiche(){
+  document.getElementById('poissons').classList.remove('mode-fiche');
+  document.querySelectorAll('.rn-fish').forEach(b => b.classList.remove('actif'));
+}
+
+function choisirOnglet(nom){
+  document.querySelectorAll('#seine .onglet').forEach(b => b.classList.toggle('actif', b.dataset.onglet === nom));
+  document.querySelectorAll('#seine .panneau-onglet').forEach(p => p.classList.remove('actif'));
+  document.getElementById('onglet-' + nom).classList.add('actif');
+}
+
+/* ============================================================
+   CARTE DES STATIONS
+   ============================================================ */
+function afficherStation(id){
+  const s = STATIONS.find(x => x.id === id);
+  if(!s) return;
+  document.querySelectorAll('.pin').forEach(b => b.classList.toggle('actif', b.dataset.id === id));
+  const cible = document.getElementById('station-detail');
+  cible.innerHTML = `
+    <span class="fiche-badge ${s.statut ? 'cata' : ''}">${s.statut ? s.statut : 'Station en fonctionnement'}</span>
+    <div class="fiche-entete"><h2>${s.nom}</h2><span class="latin">${s.riviere}</span></div>
+    <div class="stat-grille">
+      <div class="stat"><div class="label">Distance</div><div class="valeur">${s.distance}</div></div>
+      <div class="stat"><div class="label">Cours d'eau</div><div class="valeur">${s.riviere}</div></div>
+      <div class="stat"><div class="label">Dispositif</div><div class="valeur">${s.depuis}</div></div>
+      <div class="stat"><div class="label">Gestion</div><div class="valeur">${s.gestion}</div></div>
+    </div>
+    <p class="long">${s.desc}</p>
+    <div class="fiche-anecdote">${s.chiffre}</div>
+    ${s.live ? `<div class="station-live"><p class="live-label">🔴 Caméra de la station en direct</p><iframe src="https://www.youtube.com/embed/live_stream?channel=UC9xh6nfa1C8kXT6e7xy-VUg&controls=1" title="Caméra en direct — station de Pontoise" allowfullscreen loading="lazy"></iframe></div>` : ''}
+    <a class="lien-source tap" href="${s.url}" target="_blank" rel="noopener">Voir les données complètes sur seinormigr.fr →</a>
+  `;
+}
+
+/* ============================================================
+   NAVIGATION ENTRE ECRANS + retour auto à la veille
+   ============================================================ */
+let ecranCourant = 'veille';
+let veilleTimer = null;
+
+function allerA(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  ecranCourant = id;
+  document.getElementById('riviere-nav').classList.toggle('masquee', id === 'veille');
+  if(id !== 'veille'){ resetVeilleTimer(); } else { clearTimeout(veilleTimer); }
+}
+
+function resetVeilleTimer(){
+  clearTimeout(veilleTimer);
+  veilleTimer = setTimeout(() => {
+    fermerFiche();
+    choisirOnglet('historique');
+    allerA('veille');
+  }, 90000); // 90s d'inactivité -> retour à l'écran de veille
+}
+
+['click','touchstart'].forEach(evt => {
+  document.addEventListener(evt, () => { if(ecranCourant !== 'veille') resetVeilleTimer(); }, {passive:true});
+});
+
+/* ============================================================
+   ESPACE JEUNES PUBLICS : bascule d'onglets
+   ============================================================ */
+function choisirJeu(nom){
+  document.querySelectorAll('#jeunes .onglet').forEach(b => b.classList.toggle('actif', b.dataset.jeu === nom));
+  document.querySelectorAll('#jeunes .panneau-onglet').forEach(p => p.classList.remove('actif'));
+  document.getElementById('jeu-' + nom).classList.add('actif');
+  if(nom === 'labyrinthe'){ renderLabyrinthe(); }
+}
+
+/* ---------- Jeu 1 : Memory des poissons ---------- */
+let memoryState = { cards:[], flipped:[], matched:new Set(), moves:0, locked:false };
+
+function initMemory(){
+  let cards = [];
+  POISSONS.forEach(p => { cards.push({especeId:p.id}); cards.push({especeId:p.id}); });
+  for(let i = cards.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  cards = cards.map((c, i) => ({...c, uid:i}));
+  memoryState = { cards, flipped:[], matched:new Set(), moves:0, locked:false };
+  const victoire = document.getElementById('memory-victoire');
+  if(victoire) victoire.remove();
+  renderMemory();
+  updateMemoryInfo();
+}
+
+function renderMemory(){
+  const cible = document.getElementById('memory-grille');
+  if(!cible) return;
+  cible.innerHTML = memoryState.cards.map(c => {
+    const p = POISSONS.find(x => x.id === c.especeId);
+    const estRetournee = memoryState.flipped.includes(c.uid) || memoryState.matched.has(c.uid);
+    return `<button class="memory-carte tap ${estRetournee ? 'retournee' : ''} ${memoryState.matched.has(c.uid) ? 'trouvee' : ''}" data-uid="${c.uid}" onclick="retournerCarte(${c.uid})">
+      <span class="dos">〜</span>
+      <span class="face">${svgFish(p, false)}<b>${p.nom}</b></span>
+    </button>`;
+  }).join('');
+}
+
+function updateMemoryInfo(){
+  const el = document.getElementById('memory-info');
+  if(!el) return;
+  el.textContent = `Coups : ${memoryState.moves} · Paires trouvées : ${memoryState.matched.size / 2} / ${POISSONS.length}`;
+}
+
+function retournerCarte(uid){
+  if(memoryState.locked) return;
+  if(memoryState.flipped.includes(uid) || memoryState.matched.has(uid)) return;
+  memoryState.flipped.push(uid);
+  renderMemory();
+  if(memoryState.flipped.length === 2){
+    memoryState.moves++;
+    memoryState.locked = true;
+    const [a, b] = memoryState.flipped;
+    const ca = memoryState.cards.find(c => c.uid === a);
+    const cb = memoryState.cards.find(c => c.uid === b);
+    if(ca.especeId === cb.especeId){
+      memoryState.matched.add(a); memoryState.matched.add(b);
+      memoryState.flipped = [];
+      memoryState.locked = false;
+      updateMemoryInfo();
+      renderMemory();
+      if(memoryState.matched.size === memoryState.cards.length){
+        setTimeout(() => {
+          const cible = document.getElementById('jeu-memory');
+          if(!document.getElementById('memory-victoire')){
+            const msg = document.createElement('p');
+            msg.id = 'memory-victoire';
+            msg.className = 'lab-victoire';
+            msg.textContent = `🎉 Bravo ! Toutes les paires trouvées en ${memoryState.moves} coups.`;
+            cible.appendChild(msg);
+          }
+        }, 200);
+      }
+    } else {
+      updateMemoryInfo();
+      setTimeout(() => {
+        memoryState.flipped = [];
+        memoryState.locked = false;
+        renderMemory();
+      }, 900);
+    }
+  }
+}
+
+/* ---------- Jeu 2 : Labyrinthe de l'anguille ---------- */
+// 1 = case ouverte, 0 = case fermée. Index 0 = la mer (départ), dernier index = les frayères (arrivée).
+const LAB_ROWS = [
+  [1,1,1,1,1], // 0  Mer (départ)
+  [1,1,1,1,1], // 1  bassin
+  [1,0,0,0,0], // 2  fente à gauche
+  [1,1,1,1,1], // 3  bassin
+  [0,0,0,0,1], // 4  fente à droite
+  [1,1,1,1,1], // 5  bassin
+  [1,0,0,0,0], // 6  fente à gauche
+  [1,1,1,1,1], // 7  bassin
+  [0,0,0,0,1], // 8  fente à droite
+  [1,1,1,1,1], // 9  bassin
+  [1,0,0,0,0], // 10 fente à gauche
+  [1,1,1,1,1], // 11 bassin
+  [0,0,0,0,1], // 12 fente à droite
+  [1,1,1,1,1]  // 13 Frayères (arrivée)
+];
+let labPos = { row:0, col:2 };
+
+function initLabyrinthe(){
+  labPos = { row:0, col:2 };
+  const victoire = document.getElementById('lab-victoire');
+  if(victoire) victoire.remove();
+  renderLabyrinthe();
+}
+
+function renderLabyrinthe(){
+  const cible = document.getElementById('lab-grille');
+  if(!cible) return;
+  const anguille = POISSONS.find(p => p.id === 'anguille');
+  let html = '';
+  for(let r = LAB_ROWS.length - 1; r >= 0; r--){
+    for(let c = 0; c < 5; c++){
+      const ouverte = LAB_ROWS[r][c] === 1;
+      let cls = 'lab-cell ' + (ouverte ? 'ouverte' : 'fermee');
+      if(r === 0) cls += ' depart';
+      if(r === LAB_ROWS.length - 1) cls += ' but';
+      let occ = '';
+      if(labPos.row === r && labPos.col === c){ occ = svgFish(anguille, false); }
+      html += `<div class="${cls}">${occ ? `<span class="occupant">${occ}</span>` : ''}</div>`;
+    }
+  }
+  cible.innerHTML = html;
+}
+
+function deplacerAnguille(dCol, dRow){
+  const nr = labPos.row + dRow, nc = labPos.col + dCol;
+  if(nr < 0 || nr >= LAB_ROWS.length || nc < 0 || nc >= 5) return;
+  if(LAB_ROWS[nr][nc] !== 1) return;
+  labPos = { row:nr, col:nc };
+  renderLabyrinthe();
+  if(nr === LAB_ROWS.length - 1){
+    setTimeout(() => {
+      const cible = document.getElementById('jeu-labyrinthe');
+      if(!document.getElementById('lab-victoire')){
+        const msg = document.createElement('p');
+        msg.id = 'lab-victoire';
+        msg.className = 'lab-victoire';
+        msg.textContent = "🎉 Bravo, l'anguille a rejoint les frayères de l'amont !";
+        cible.appendChild(msg);
+      }
+    }, 150);
+  }
+}
+
+/* ============================================================
+   Petits poissons flottants sur l'écran de veille
+   ============================================================ */
+function initVeillePoissons(){
+  const cible = document.getElementById('veille-poissons');
+  const choix = [POISSONS[0], POISSONS[2], POISSONS[5], POISSONS[3]];
+  cible.innerHTML = choix.map((p,i) => `
+    <div class="veille-poisson" style="width:${8+i*2}vw; top:${12+i*20}%; left:${-15}%; animation: nager${i} ${26+i*6}s linear infinite;">${svgFish(p,false)}</div>
+  `).join('');
+  const style = document.createElement('style');
+  style.textContent = choix.map((p,i) => `
+    @keyframes nager${i} { from { transform: translateX(0) scaleX(-1);} 49%{transform: translateX(130vw) scaleX(-1);} 50%{transform: translateX(130vw) scaleX(1);} to { transform: translateX(0) scaleX(1);} }
+  `).join('');
+  document.head.appendChild(style);
+}
+
+/* ============================================================
+   INITIALISATION
+   ============================================================ */
+initGrillePoissons();
+initListeEspecesSci();
+initNavRiviere();
+initVeillePoissons();
+afficherStation('poses-rg');
+initMemory();
+initLabyrinthe();
+document.getElementById('riviere-nav').classList.add('masquee');
+</script>
+</body>
+</html>
