@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071C24">
+  <title>SEINOSCOPE — Le suivi scientifique</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+<section class="screen active" id="suivi">
+<div class="entete">
+<div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+
+<nav aria-label="Navigation principale" class="nav-pages"><a href="index.html">Accueil</a><a href="poissons.html">Poissons</a><a href="seine.html">La Seine</a><a aria-current="page" href="suivi.html">Suivi</a><a href="restauration.html">Restauration</a><a href="carte.html">Carte</a><a href="jeunes.html">Espace jeunes</a></nav></div>
+<div style="padding:0 4vw; height:calc(100% - 13vh);">
+<div class="section-titre">
+<h1>Le suivi scientifique</h1>
+<p class="sub">Ce que fait SEINORMIGR juste derrière la vitre</p>
+</div>
+<div class="etapes">
+<div class="etape">
+<div class="picto">🎥</div>
+<h4>Le vidéo-comptage</h4>
+<p>Une caméra filme en continu l'intérieur de la passe à poissons à travers une vitre. Quand un poisson passe devant la caméra elle enregistre une séquence qui permettra lors du visionnage des vidéos de compter et mesurer, chaque espèce.</p>
+<img alt="Vidéo-comptage Poses rive gauche" height="420" src="https://www.seinormigr.fr/msmedias/outils/stacomi/presentation/video-comptage_JPG.jpg" width="650"/>
+<span class="partenaire">SEINORMIGR</span>
+</div>
+<div class="etape">
+<div class="picto">🪤</div>
+<h4>Le piégeage anguille</h4>
+<p>Sur la rampe dédiée, un piège capture les anguilles en montaison.Trois fois par semaine le piège est relevé et les jeune anguille pesées, mesurées et dénombrées. Chaque mercredi de mai à août, la relève du piège et la biométrie sont réalisées devant le public.</p>
+<img alt="rampe/piège à anguille Poses rive gauche" height="420" src="https://seinormigr.sharepoint.com/:i:/s/Seine-NormandieMigrateurs/IQCN7Uc4wDuBQaVED1grecF4AVEU9lJjtWO3F9jiAFWXy4U?e=ZIrr2g" width="650"/>
+<span class="partenaire">SEINORMIGR</span>
+</div>
+</div>
+</div>
+</section>
+<nav id="riviere-nav">
+<span class="rn-label mer">← Mer</span>
+<div class="rn-piste">
+<svg preserveaspectratio="none" viewbox="0 0 1000 60"><path d="M0,30 C200,10 350,50 500,30 C650,10 800,50 1000,30" fill="none" stroke="rgba(127,180,194,.35)" stroke-dasharray="2 8" stroke-linecap="round" stroke-width="2"></path></svg>
+<div id="rn-fishes" style="position:relative; z-index:2; display:flex; justify-content:space-between; width:100%;"></div>
+</div>
+<span class="rn-label amont">Amont / frayères →</span>
+</nav>
+</div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

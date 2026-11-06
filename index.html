@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071C24">
+  <title>SEINOSCOPE — Accueil</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+<section class="screen active" id="veille">
+<div class="eau-fx"><svg preserveaspectratio="none" viewbox="0 0 1000 600">
+<path class="ligne-eau" d="M0,120 C250,80 750,160 1000,110"></path>
+<path class="ligne-eau" d="M0,260 C300,220 700,300 1000,250"></path>
+<path class="ligne-eau" d="M0,420 C280,470 720,380 1000,430"></path>
+</svg></div>
+<div class="veille-poissons" id="veille-poissons"></div>
+<div class="veille-centre">
+<span class="veille-eyebrow">Seinoscope · Poses · Passe à poissons</span>
+<h1 class="veille-titre">Sur la piste des<br/><em>poissons migrateurs</em><br/>de la Seine</h1>
+<p class="veille-sous">Saumons, aloses, lamproies et anguilles remontent ou redescendent le fleuve juste sous vos pieds. Touchez l'écran pour partir à leur rencontre.</p>
+<button
+  type="button"
+  class="veille-cta tap"
+  onclick="ouvrirAccueil()"
+>
+  Toucher pour commencer →
+</button>
+</div>
+</section><section class="screen" id="accueil">
+<div class="entete">
+<div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+<nav aria-label="Navigation principale" class="nav-pages"><a aria-current="page" href="index.html">Accueil</a><a href="poissons.html">Poissons</a><a href="seine.html">La Seine</a><a href="suivi.html">Suivi</a><a href="restauration.html">Restauration</a><a href="carte.html">Carte</a><a href="jeunes.html">Espace jeunes</a></nav></div>
+<div class="accueil-corps">
+<div class="accueil-intro">
+<h1>Que voulez-vous explorer ?</h1>
+<p>Le SEINOSCOPE observe, sous le niveau de l'eau, les poissons qui franchissent le barrage de Poses. Choisissez un thème pour commencer.</p>
+</div>
+<div class="menu-grille">
+<a class="carte-menu tap" href="poissons.html"></a>
+<span class="num"></span>
+<h3>Les poissons migrateurs</h3>
+<span class="desc">Six espèces qui voyagent entre mer et rivière</span>
+<span class="fleche">→</span>
+</button>
+<button class="carte-menu tap" onclick="allerA('seine')">
+<span class="num"></span>
+<h3>La Seine,d'hier à aujourd'hui</h3>
+<span class="desc">Deux regards : historique et scientifique</span>
+<span class="fleche">→</span>
+</button>
+<button class="carte-menu tap" onclick="allerA('suivi')">
+<span class="num"></span>
+<h3>Le suivi scientifique</h3>
+<span class="desc">Vidéo-comptage et piégeage anguille en direct</span>
+<span class="fleche">→</span>
+</button>
+<button class="carte-menu tap" onclick="allerA('restauration')">
+<span class="num"></span>
+<h3>Restaurer le fleuve</h3>
+<span class="desc">Passes à poissons et continuité écologique</span>
+<span class="fleche">→</span>
+</button>
+<button class="carte-menu tap" onclick="allerA('carte')">
+<span class="num"></span>
+<h3>La carte des stations</h3>
+<span class="desc">Barrages et stations de comptage sur la Seine, l'Oise et la Marne</span>
+<span class="fleche">→</span>
+</button>
+<button class="carte-menu tap" onclick="allerA('jeunes')">
+<span class="num"></span>
+<h3>Espace jeunes publics</h3>
+<span class="desc">Memory des poissons et labyrinthe de l'anguille</span>
+<span class="fleche">→</span>
+</button>
+</div>
+</div>
+</section>
+<nav id="riviere-nav">
+<span class="rn-label mer">← Mer</span>
+<div class="rn-piste">
+<svg preserveaspectratio="none" viewbox="0 0 1000 60"><path d="M0,30 C200,10 350,50 500,30 C650,10 800,50 1000,30" fill="none" stroke="rgba(127,180,194,.35)" stroke-dasharray="2 8" stroke-linecap="round" stroke-width="2"></path></svg>
+<div id="rn-fishes" style="position:relative; z-index:2; display:flex; justify-content:space-between; width:100%;"></div>
+</div>
+<span class="rn-label amont">Amont / frayères →</span>
+</nav>
+</div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071C24">
+  <title>SEINOSCOPE — Les stations de contrôle</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+<section class="screen active" id="carte">
+<div class="entete">
+<div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+
+<nav aria-label="Navigation principale" class="nav-pages"><a href="index.html">Accueil</a><a href="poissons.html">Poissons</a><a href="seine.html">La Seine</a><a href="suivi.html">Suivi</a><a href="restauration.html">Restauration</a><a aria-current="page" href="carte.html">Carte</a><a href="jeunes.html">Espace jeunes</a></nav></div>
+<div class="carte-layout">
+<div class="carte-map-wrap">
+<div class="section-titre" style="margin-bottom:1.2vh;">
+<h1>Les stations de contrôle</h1>
+<p class="sub">Touchez un point pour découvrir la station</p>
+</div>
+<div class="carte-svg-holder">
+<svg aria-label="Schéma des cours d'eau et stations de contrôle" preserveaspectratio="xMidYMid meet" viewbox="0 0 1000 800">
+<!-- Seine : axe principal, de la mer vers l'amont -->
+<path d="M35,420 C150,414 205,420 265,422 C310,424 340,405 385,405 C420,405 445,430 480,438 C555,455 620,425 690,402 C775,375 855,365 965,350" fill="none" opacity="0.85" stroke="var(--eau-claire)" stroke-linecap="round" stroke-width="7"></path>
+<!-- Oise : descend vers la Seine depuis le nord -->
+<path d="M250,35 C265,65 270,95 270,135 C270,200 265,265 265,330 C265,365 275,390 300,415" fill="none" opacity="0.85" stroke="var(--eau-mid)" stroke-linecap="round" stroke-width="5"></path>
+<!-- Aisne : affluent de l'Oise, vers l'est -->
+<path d="M265,92 C350,78 430,62 520,48 C610,35 700,35 820,35" fill="none" opacity="0.85" stroke="var(--eau-mid)" stroke-linecap="round" stroke-width="5"></path>
+<!-- Marne : affluent de la Seine, vers le sud-est -->
+<path d="M480,438 C485,500 495,555 510,615 C525,680 555,735 585,790" fill="none" opacity="0.85" stroke="var(--eau-mid)" stroke-linecap="round" stroke-width="5"></path>
+<text fill="var(--embrun)" font-family="IBM Plex Mono, monospace" font-size="15" x="55" y="395">↞ vers la mer</text>
+<text fill="var(--limon)" font-family="IBM Plex Mono, monospace" font-size="15" x="800" y="335">vers l'amont ↠</text>
+<text fill="var(--embrun)" font-family="IBM Plex Mono, monospace" font-size="15" font-style="italic" x="325" y="18">Oise</text>
+<text fill="var(--embrun)" font-family="IBM Plex Mono, monospace" font-size="13" font-style="italic" x="525" y="28">Aisne</text>
+<text fill="var(--embrun)" font-family="IBM Plex Mono, monospace" font-size="15" font-style="italic" x="520" y="620">Marne</text>
+<text fill="var(--ecume)" font-family="Fraunces, serif" font-size="16" opacity="0.7" x="380" y="395">Paris</text>
+<text fill="var(--ecume)" font-family="Fraunces, serif" font-size="16" opacity="0.85" x="45" y="445">Seine</text>
+</svg>
+<div class="carte-pins">
+<!-- Positions recalées sur le nouveau tracé -->
+<button class="pin tap" data-id="poses-rg" onclick="afficherStation('poses-rg')" style="left:8%; top:52.5%;" type="button"><span class="pin-point"></span><span class="pin-label">Poses RG</span></button>
+<button class="pin tap" data-id="poses-rd" onclick="afficherStation('poses-rd')" style="left:12%; top:55%;" type="button"><span class="pin-point"></span><span class="pin-label">Poses RD</span></button>
+<button class="pin tap" data-id="pontoise" onclick="afficherStation('pontoise')" style="left:27%; top:14.5%;" type="button"><span class="pin-point"></span><span class="pin-label">Pontoise · Oise</span></button>
+<button class="pin tap" data-id="choisy-au-bac" onclick="afficherStation('choisy-au-bac')" style="left:31%; top:9.5%;" type="button"><span class="pin-point"></span><span class="pin-label">Choisy-au-Bac · Aisne</span></button>
+<button class="pin tap" data-id="maisons-alfort" onclick="afficherStation('maisons-alfort')" style="left:48%; top:55%;" type="button"><span class="pin-point"></span><span class="pin-label">Maisons-Alfort · Marne</span></button>
+</div>
+</div>
+<div class="carte-legende">
+<span><span class="puce-legende"></span> Station en fonctionnement</span>
+<span><span class="puce-legende cuivre"></span> Station sélectionnée</span>
+</div>
+</div>
+<div class="fiche-texte" id="station-detail"></div>
+</div>
+</section>
+<nav id="riviere-nav">
+<span class="rn-label mer">← Mer</span>
+<div class="rn-piste">
+<svg preserveaspectratio="none" viewbox="0 0 1000 60"><path d="M0,30 C200,10 350,50 500,30 C650,10 800,50 1000,30" fill="none" stroke="rgba(127,180,194,.35)" stroke-dasharray="2 8" stroke-linecap="round" stroke-width="2"></path></svg>
+<div id="rn-fishes" style="position:relative; z-index:2; display:flex; justify-content:space-between; width:100%;"></div>
+</div>
+<span class="rn-label amont">Amont / frayères →</span>
+</nav>
+</div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

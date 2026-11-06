@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071C24">
+  <title>SEINOSCOPE — La Seine</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+<section class="screen active" id="seine">
+<div class="entete">
+<div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+
+<nav aria-label="Navigation principale" class="nav-pages"><a href="index.html">Accueil</a><a href="poissons.html">Poissons</a><a aria-current="page" href="seine.html">La Seine</a><a href="suivi.html">Suivi</a><a href="restauration.html">Restauration</a><a href="carte.html">Carte</a><a href="jeunes.html">Espace jeunes</a></nav></div>
+<div style="padding:0 4vw; height:calc(100% - 13vh);">
+<div class="section-titre">
+<h1>La Seine, deux regards</h1>
+<p class="sub">Un même fleuve, vu par l'histoire et vu par la science</p>
+</div>
+<div class="onglets">
+<button class="onglet actif tap" data-onglet="historique" onclick="choisirOnglet('historique')">Regard historique</button>
+<button class="onglet tap" data-onglet="scientifique" onclick="choisirOnglet('scientifique')">Regard scientifique</button>
+</div>
+<div class="panneau-onglet actif" id="onglet-historique">
+<div class="frise">
+<div class="frise-item">
+<span class="periode">Avant l'industrialisation</span>
+<h4>Un fleuve libre</h4>
+<p>La Seine coule sans grand obstacle : saumons, aloses et lamproies remontent librement depuis la Manche jusqu'aux frayères de l'amont, parfois à des centaines de kilomètres de l'estuaire.</p>
+</div>
+<div class="frise-item">
+<span class="periode">XIXe – XXe siècle</span>
+<h4>Le temps des barrages</h4>
+<p>Pour la navigation, l'industrie et l'énergie, le fleuve se couvre de barrages et d'écluses, dont celui de Poses. Chaque ouvrage devient un obstacle que les poissons migrateurs ne savent plus franchir.</p>
+</div>
+<div class="frise-item">
+<span class="periode">Fin du XXe siècle</span>
+<h4>Le déclin des migrateurs</h4>
+<p>Obstacles infranchissables, pollutions et dégradation des habitats font chuter les populations de poissons migrateurs sur l'ensemble du bassin de la Seine.</p>
+</div>
+<div class="frise-item">
+<span class="periode">Depuis 2008</span>
+<h4>La reconquête du fleuve</h4>
+<p>Une première passe à poissons et un vidéo-comptage sont mis en service à Poses en 2008, complétés par une rampe à anguilles en 2014 puis par une seconde passe, en rive droite, achevée en 2017.</p>
+</div>
+<div class="frise-item">
+<span class="periode">Aujourd'hui</span>
+<h4>Observer pour mieux protéger</h4>
+<p>Le SEINOSCOPE donne à voir, en direct et sous l'eau, ce travail de restauration mené par la Fédération de Pêche de l'Eure, SEINORMIGR et le Syndicat de Léry-Poses, en lien avec le réseau de stations STACOMI du bassin.</p>
+</div>
+</div>
+</div>
+<div class="panneau-onglet" id="onglet-scientifique">
+<div class="grille-2">
+<div class="bloc-carte">
+<h4>Espèces suivies à Poses</h4>
+<div id="liste-especes-sci"></div>
+</div>
+<div class="bloc-carte">
+<h4>Actions de restauration en cours</h4>
+<ul>
+<li>Deux passes à poissons sur le barrage de Poses (rive gauche depuis 2008, rive droite depuis 2017)</li>
+<li>Rampe à anguilles dédiée à la montaison des civelles et anguillettes</li>
+<li>Vidéo-comptage en continu de chaque poisson franchissant l'ouvrage</li>
+<li>Piégeage et biométrie des anguilles pour suivre la population</li>
+<li>Extension du réseau de stations de comptage vers Pontoise (Oise) et Maisons-Alfort (Marne)</li>
+</ul>
+<p style="margin-top:1.4vh;">Voir le détail de chaque station dans la rubrique <strong>« La carte des stations »</strong>.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<nav id="riviere-nav">
+<span class="rn-label mer">← Mer</span>
+<div class="rn-piste">
+<svg preserveaspectratio="none" viewbox="0 0 1000 60"><path d="M0,30 C200,10 350,50 500,30 C650,10 800,50 1000,30" fill="none" stroke="rgba(127,180,194,.35)" stroke-dasharray="2 8" stroke-linecap="round" stroke-width="2"></path></svg>
+<div id="rn-fishes" style="position:relative; z-index:2; display:flex; justify-content:space-between; width:100%;"></div>
+</div>
+<span class="rn-label amont">Amont / frayères →</span>
+</nav>
+</div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071C24">
+  <title>SEINOSCOPE — Espace jeunes</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+<section class="screen active" id="jeunes">
+<div class="entete">
+<div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+
+<nav aria-label="Navigation principale" class="nav-pages"><a href="index.html">Accueil</a><a href="poissons.html">Poissons</a><a href="seine.html">La Seine</a><a href="suivi.html">Suivi</a><a href="restauration.html">Restauration</a><a href="carte.html">Carte</a><a aria-current="page" href="jeunes.html">Espace jeunes</a></nav></div>
+<div style="padding:0 4vw; height:calc(100% - 13vh);">
+<div class="section-titre">
+<h1>Espace jeunes publics</h1>
+<p class="sub">Deux jeux pour découvrir les poissons migrateurs en s'amusant</p>
+</div>
+<div class="onglets">
+<button class="onglet actif tap" data-jeu="memory" onclick="choisirJeu('memory')">🧠 Memory des poissons</button>
+<button class="onglet tap" data-jeu="labyrinthe" onclick="choisirJeu('labyrinthe')">🐍 Labyrinthe de l'anguille</button>
+</div>
+<div class="panneau-onglet actif" id="jeu-memory">
+<p class="memory-info" id="memory-info">Coups : 0 · Paires trouvées : 0 / 6</p>
+<div class="memory-grille" id="memory-grille"></div>
+<button class="btn-jeu tap" onclick="initMemory()">🔄 Nouvelle partie</button>
+</div>
+<div class="panneau-onglet" id="jeu-labyrinthe">
+<p class="lab-intro">Comme à la station de Pontoise, la passe à poissons est faite de bassins successifs reliés par une étroite fente, tantôt à gauche, tantôt à droite. Guidez l'anguille depuis la mer, en bas, jusqu'aux frayères de l'amont, en haut.</p>
+<div class="lab-layout">
+<div class="lab-grille" id="lab-grille"></div>
+<div class="lab-controles">
+<button class="lab-btn tap" onclick="deplacerAnguille(0,1)">▲</button>
+<div class="lab-ligne">
+<button class="lab-btn tap" onclick="deplacerAnguille(-1,0)">◀</button>
+<button class="lab-btn tap" onclick="deplacerAnguille(1,0)">▶</button>
+</div>
+<button class="lab-btn tap" onclick="deplacerAnguille(0,-1)">▼</button>
+<button class="lab-reset tap" onclick="initLabyrinthe()">🔄 Recommencer</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<nav id="riviere-nav">
+<span class="rn-label mer">← Mer</span>
+<div class="rn-piste">
+<svg preserveaspectratio="none" viewbox="0 0 1000 60"><path d="M0,30 C200,10 350,50 500,30 C650,10 800,50 1000,30" fill="none" stroke="rgba(127,180,194,.35)" stroke-dasharray="2 8" stroke-linecap="round" stroke-width="2"></path></svg>
+<div id="rn-fishes" style="position:relative; z-index:2; display:flex; justify-content:space-between; width:100%;"></div>
+</div>
+<span class="rn-label amont">Amont / frayères →</span>
+</nav>
+</div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

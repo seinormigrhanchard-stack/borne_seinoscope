@@ -1,0 +1,8 @@
+SEINOSCOPE — version multi-pages
+
+Ouvrir index.html dans un navigateur pour lancer le site.
+Les sept pages HTML partagent css/style.css, js/data.js et js/app.js.
+Les photographies originales sont conservées dans photos/.
+
+Pour une mise en ligne, transférer tout le dossier SEINOSCOPE en conservant
+exactement cette arborescence et les noms de fichiers.

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071C24">
+  <title>SEINOSCOPE — Restaurer le fleuve</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+<section class="screen active" id="restauration">
+<div class="entete">
+<div class="marque"><span class="nom">SEINOSCOPE</span><span class="lieu">Poses · Eure · Passe à poissons</span></div>
+
+<nav aria-label="Navigation principale" class="nav-pages"><a href="index.html">Accueil</a><a href="poissons.html">Poissons</a><a href="seine.html">La Seine</a><a href="suivi.html">Suivi</a><a aria-current="page" href="restauration.html">Restauration</a><a href="carte.html">Carte</a><a href="jeunes.html">Espace jeunes</a></nav></div>
+<div style="padding:0 4vw; height:calc(100% - 13vh);">
+<div class="section-titre">
+<h1>Restaurer le fleuve</h1>
+<p class="sub">Redonner aux poissons migrateurs le chemin de leurs frayères</p>
+</div>
+<div class="etapes">
+<div class="etape">
+<div class="picto">🐟</div>
+<h4>Passe à poissons</h4>
+<p>Un dispositif en escalier de bassins successifs permet aux poissons de franchir le barrage de Poses malgré la différence de niveau d'eau, en dépensant le moins d'énergie possible.</p>
+<span class="partenaire">Syndicat de Léry-Poses</span>
+</div>
+<div class="etape">
+<div class="picto">🌱</div>
+<h4>Continuité écologique</h4>
+<p>Au-delà de Poses, chaque obstacle du bassin est étudié pour être rendu franchissable, afin que les migrateurs puissent remonter jusqu'à leurs zones de frai historiques, sur la Seine, l'Oise ou la Marne.</p>
+<span class="partenaire">FD27</span>
+</div>
+<div class="etape">
+<div class="picto">🤝</div>
+<h4>Un projet partagé</h4>
+<p>Le Syndicat de Léry-Poses met le lieu à disposition, la Fédération de Pêche de l'Eure porte le réaménagement, SEINORMIGR anime le suivi scientifique face au public.</p>
+<span class="partenaire">Poses · Eure</span>
+</div>
+</div>
+<p class="pied-partenaires">Fédération Départementale de Pêche et de Protection des Milieux Aquatiques de l'Eure · SEINORMIGR · Syndicat Mixte de la Base de Plein Air et de Loisirs de Léry-Poses</p>
+</div>
+</section>
+<nav id="riviere-nav">
+<span class="rn-label mer">← Mer</span>
+<div class="rn-piste">
+<svg preserveaspectratio="none" viewbox="0 0 1000 60"><path d="M0,30 C200,10 350,50 500,30 C650,10 800,50 1000,30" fill="none" stroke="rgba(127,180,194,.35)" stroke-dasharray="2 8" stroke-linecap="round" stroke-width="2"></path></svg>
+<div id="rn-fishes" style="position:relative; z-index:2; display:flex; justify-content:space-between; width:100%;"></div>
+</div>
+<span class="rn-label amont">Amont / frayères →</span>
+</nav>
+</div>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
